@@ -48,7 +48,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".ProfEnter" />
-        <activity android:name=".ProfReg"></activity>
+        <activity android:name=".ProfReg" />
+        <activity android:name=".Profile" />
+        <activity android:name=".Info"></activity>
     </application>
 
 </manifest>
