@@ -47,7 +47,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ProfEnter"></activity>
+        <activity android:name=".ProfEnter" />
+        <activity android:name=".ProfReg"></activity>
     </application>
 
 </manifest>
