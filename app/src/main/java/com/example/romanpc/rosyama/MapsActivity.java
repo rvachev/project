@@ -49,5 +49,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng omsk = new LatLng(55, 73.325157);
         mMap.addMarker(new MarkerOptions().position(omsk).title("Омск"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(omsk));
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        mMap.setMyLocationEnabled(true);
     }
 }
