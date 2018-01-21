@@ -24,7 +24,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"
-            app:srcCompat="@drawable/prof4" />
+            app:srcCompat="@drawable/prof4" android:contentDescription="@string/todo3" />
 
         <ImageButton
             android:id="@+id/imageButton3"
@@ -33,7 +33,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            app:srcCompat="@drawable/map" />
+            app:srcCompat="@drawable/map" android:contentDescription="@string/todo2" />
 
         <ImageButton
             android:id="@+id/imageButton2"
@@ -42,7 +42,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            app:srcCompat="@drawable/info4" />
+            app:srcCompat="@drawable/info4" android:contentDescription="@string/todo" />
     </LinearLayout>
 
     <TextView
@@ -51,11 +51,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="E-mail:"
+        android:text="@string/e_mail"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="16dp" />
 
     <EditText
         android:id="@+id/editText"
@@ -64,10 +65,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="E-mail"
+        android:hint="@string/e_mail_edt"
         android:inputType="textPersonName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        android:layout_marginLeft="16dp" />
 
     <TextView
         android:id="@+id/textView2"
@@ -75,11 +77,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Пароль:"
+        android:text="@string/pass"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText" />
+        app:layout_constraintTop_toBottomOf="@+id/editText"
+        android:layout_marginLeft="16dp" />
 
     <EditText
         android:id="@+id/editText2"
@@ -88,10 +91,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="Пароль"
+        android:hint="@string/pass_edt"
         android:inputType="textPassword"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+        app:layout_constraintTop_toBottomOf="@+id/textView2"
+        android:layout_marginLeft="16dp" />
 
     <Button
         android:id="@+id/button2"
@@ -102,7 +106,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:text="Войти"
+        android:text="@string/enter"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/toolbar"
         app:layout_constraintEnd_toEndOf="parent"

@@ -24,7 +24,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/colorPrimaryDark"
-            app:srcCompat="@drawable/prof4" />
+            app:srcCompat="@drawable/prof4" android:contentDescription="@string/todo6" />
 
         <ImageButton
             android:id="@+id/imageButton3"
@@ -33,7 +33,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            app:srcCompat="@drawable/map" />
+            app:srcCompat="@drawable/map" android:contentDescription="@string/todo8" />
 
         <ImageButton
             android:id="@+id/imageButton2"
@@ -42,7 +42,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/colorPrimary"
-            app:srcCompat="@drawable/info4" />
+            app:srcCompat="@drawable/info4" android:contentDescription="@string/todo7" />
     </LinearLayout>
 
     <ImageView
@@ -55,7 +55,7 @@
         app:layout_constraintHorizontal_bias="0.065"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/googleg_standard_color_18" />
+        app:srcCompat="@drawable/googleg_standard_color_18" android:contentDescription="@string/todo9" />
 
     <TextView
         android:id="@+id/textView6"
@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
-        android:text="Никнейм:"
+        android:text="@string/nick1"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -75,7 +75,7 @@
         android:layout_height="33dp"
         android:layout_marginStart="24dp"
         android:layout_marginTop="8dp"
-        android:text="Роман"
+        android:text="@string/name"
         android:textColor="@color/colorAccent"
         android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -87,7 +87,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="12dp"
-        android:text="Город:"
+        android:text="@string/city"
         android:textColor="@android:color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toEndOf="@+id/imageView"
@@ -99,7 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
-        android:text="Омск"
+        android:text="@string/city_user"
         android:textColor="@color/colorAccent"
         android:textSize="24sp"
         app:layout_constraintStart_toEndOf="@+id/imageView"
