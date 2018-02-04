@@ -22,6 +22,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
@@ -59,51 +61,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        LocationListener listener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                if (location!=null) {
-                    //lathitude.setText(String.valueOf(location.getLatitude()));
-                    //longitude.setText(String.valueOf(location.getLongitude()));
-                    Double res = CalculationDistance(new LatLng(location.getLatitude(), location.getLongitude()), new LatLng(55, 73.325157));
-                    Toast.makeText(MapsActivity.this, res.toString(), Toast.LENGTH_SHORT).show();
-                }
-                else{
-                    Toast.makeText(MapsActivity.this, "Нет данных", Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-            }
-            @Override
-            public void onProviderEnabled(String provider) {
-            }
-            @Override
-            public void onProviderDisabled(String provider) {
-            }
-        };
 
         //LatLng omsk = new LatLng(55, 73.325157);
-        int j = 0, k = 0;
-        for(int i = 0; i < 3; i++) {
-            mMap.addMarker(new MarkerOptions().position(new LatLng(k, j)).title("Город").icon(BitmapDescriptorFactory.fromResource(R.drawable.mapicon1)));
-            j += 25;
-            k += 25;
+        ArrayList<String> coords = new ArrayList<>();
+        coords.add("55;73");
+        coords.add("56;74");
+        coords.add("57;75");
+        coords.add("58;76");
+        for(int i = 0; i < coords.size(); i++) {
+            String[] s = coords.get(i).split(";");
+
+            mMap.addMarker(new MarkerOptions().position(new LatLng(55, 73)).title("Город"));
         }
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mMap.setMyLocationEnabled(true);
-    }
-
-    public static double CalculationDistance(LatLng StartP, LatLng EndP) {
-        return CalculationDistanceByCoord(StartP.latitude, StartP.longitude, EndP.latitude, EndP.longitude);
-    }
-
-    private static double CalculationDistanceByCoord(double startPointLat,double startPointLon,double endPointLat,double endPointLon){
-        float[] results = new float[1];
-        Location.distanceBetween(startPointLat, startPointLon, endPointLat, endPointLon, results);
-        return results[0];
     }
 }
