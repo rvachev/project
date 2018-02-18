@@ -8,7 +8,7 @@
          location permissions for the 'MyLocation' functionality. 
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -50,16 +50,17 @@
         </activity>
         <activity
             android:name=".ProfEnter"
-            android:label="Вход"/>
+            android:label="Вход" />
         <activity
             android:name=".ProfReg"
-            android:label="Регистрация"/>
+            android:label="Регистрация" />
         <activity
             android:name=".Profile"
-            android:label="Профиль"/>
+            android:label="Профиль" />
         <activity
             android:name=".Info"
-            android:label="Информация"/>
+            android:label="Информация" />
+        <activity android:name=".CreateMarker"></activity>
     </application>
 
 </manifest>
