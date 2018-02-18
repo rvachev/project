@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/RosYama.iml" filepath="$PROJECT_DIR$/RosYama.iml" />
       <module fileurl="file://C:\AndroidProject\project\RosYama.iml" filepath="C:\AndroidProject\project\RosYama.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/project.iml" filepath="$PROJECT_DIR$/project.iml" />
       <module fileurl="file://C:\Users\RomanPC\AndroidStudioProjects\RosYama\project.iml" filepath="C:\Users\RomanPC\AndroidStudioProjects\RosYama\project.iml" />
     </modules>
   </component>

@@ -60,7 +60,11 @@
         <activity
             android:name=".Info"
             android:label="Информация" />
-        <activity android:name=".CreateMarker"></activity>
+        <activity android:name=".CreateMarker" />
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

@@ -62,7 +62,7 @@ public class ProfAftRegActivity extends AppCompatActivity {
         btnMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ProfAftRegActivity.this, MapsActivity.class);
+                Intent intent = new Intent(ProfAftRegActivity.this, MainActivity.class);
                 startActivity(intent);
             }
         });

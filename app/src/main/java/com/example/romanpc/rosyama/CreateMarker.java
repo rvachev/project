@@ -18,13 +18,12 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_marker);
 
-        mapView = (MapView)findViewById(R.id.mapView);
+        mapView = (MapView) findViewById(R.id.mapView);
         mapView.getMapAsync(this);
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        mMap.set
     }
 }
