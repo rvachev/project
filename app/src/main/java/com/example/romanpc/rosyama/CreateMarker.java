@@ -43,7 +43,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(CreateMarker.this, MapsActivity.class);
+                Intent intent = new Intent(CreateMarker.this, MainActivity.class);
                 startActivity(intent);
             }
         });
