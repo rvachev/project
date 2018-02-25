@@ -22,12 +22,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class CreateMarker extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     MapView mapView;
     TextView txtcoords;
     Button btn;
+    double lat, lng;
     private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
@@ -43,6 +47,8 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                DataBaseHelper dataBaseHelper = new DataBaseHelper(CreateMarker.this);
+                dataBaseHelper.addPit(lat, lng);
                 Intent intent = new Intent(CreateMarker.this, MainActivity.class);
                 startActivity(intent);
             }
@@ -51,7 +57,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        txtcoords = (TextView)findViewById(R.id.textView18);
+        txtcoords = (TextView) findViewById(R.id.textView18);
         mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -61,8 +67,8 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onMapLongClick(LatLng latLng) {
                 mMap.addMarker(new MarkerOptions().position(latLng));
-                double lat = latLng.latitude;
-                double lng = latLng.longitude;
+                lat = latLng.latitude;
+                lng = latLng.longitude;
                 txtcoords.setText(String.valueOf(lat) + " " + String.valueOf(lng));
             }
         });
@@ -74,7 +80,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15);
                         mMap.animateCamera(cameraUpdate);
                         if (location != null) {
-                            // Logic to handle location object
+
                         }
                     }
                 });

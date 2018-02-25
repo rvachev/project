@@ -29,6 +29,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, com.google.android.gms.location.LocationListener {
 
     private GoogleMap mMap;
@@ -78,18 +81,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-//        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-//            @Override
-//            public void onMapLongClick(LatLng latLng) {
-//                mMap.addMarker(new MarkerOptions().position(latLng).title("User point"));
-//            }
-//        });
-//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//                return false;
-//            }
-//        });
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
+        ArrayList<HashMap<String,String>> listPits = dataBaseHelper.getPits();
+        int i = 0;
+        while(i < listPits.size()){
+            double lat = Double.parseDouble(listPits.get(i).get("Lat"));
+            double lng = Double.parseDouble(listPits.get(i).get("Lng"));
+            mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
+        }
+
         createLocationRequest();
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
