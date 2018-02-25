@@ -44,11 +44,6 @@ public class DataBaseHelper extends SQLiteOpenHelper{
                 "    photo TEXT\n" +
                 ")";
         sqLiteDatabase.execSQL(sqlQuery3);
-
-        String sqlOper = "INSERT INTO pits (_id, latitude, longitude, city_id) VALUES (1, 55.04120890919084, 73.3288586139679, 1),\n" +
-                "(2, 55.040901917984066, 73.32994189113377, 1),\n" +
-                "(3, 55.0406573607271, 73.3306862041354, 1)";
-        sqLiteDatabase.execSQL(sqlOper);
     }
 
     @Override
@@ -57,6 +52,7 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     }
 
     public void addPit(double lat, double lng){
+        //Объект, позволяющий записывать БД
         SQLiteDatabase writableDatabase = this.getWritableDatabase();
         String sql = "INSERT INTO pits (latitude, longitude) VALUES ("+lat+", "+lng+")";
         writableDatabase.execSQL(sql);
