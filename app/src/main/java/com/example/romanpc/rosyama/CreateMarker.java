@@ -1,9 +1,12 @@
 package com.example.romanpc.rosyama;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.provider.SyncStateContract;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +15,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -19,11 +24,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.MissingResourceException;
+
+import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 
 public class CreateMarker extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -33,6 +42,8 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
     Button btn;
     double lat, lng;
     private FusedLocationProviderClient mFusedLocationClient;
+    private int isCreate = 0;
+    private int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +68,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        isCreate = 0;
         txtcoords = (TextView) findViewById(R.id.textView18);
         mMap = googleMap;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -66,10 +78,24 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                mMap.addMarker(new MarkerOptions().position(latLng));
-                lat = latLng.latitude;
-                lng = latLng.longitude;
-                txtcoords.setText(String.valueOf(lat) + " " + String.valueOf(lng));
+                if(isCreate == 0) {
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
+                    lat = latLng.latitude;
+                    lng = latLng.longitude;
+                    txtcoords.setText(String.valueOf(lat) + "\n" + String.valueOf(lng));
+                    DataBaseHelper dataBaseHelper = new DataBaseHelper(CreateMarker.this);
+                    id = dataBaseHelper.getId();
+                    id++;
+                    marker.setTag(id);
+                    isCreate++;
+                }else{
+                    mMap.clear();
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
+                    lat = latLng.latitude;
+                    lng = latLng.longitude;
+                    txtcoords.setText(String.valueOf(lat) + "\n" + String.valueOf(lng));
+                    marker.setTag(id);
+                }
             }
         });
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -79,9 +105,6 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
                     public void onSuccess(Location location) {
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15);
                         mMap.animateCamera(cameraUpdate);
-                        if (location != null) {
-
-                        }
                     }
                 });
     }

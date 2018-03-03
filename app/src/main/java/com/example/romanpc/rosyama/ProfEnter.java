@@ -5,12 +5,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
+
+import java.util.Scanner;
 
 public class ProfEnter extends AppCompatActivity {
 
     private ImageButton btnProf, btnMap, btnInfo;
     private Button btnEnt;
+    //private EditText edt_email, edt_pass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +27,9 @@ public class ProfEnter extends AppCompatActivity {
             Intent intent = new Intent(ProfEnter.this, Profile.class);
             startActivity(intent);
         }
+
+//        edt_email = (EditText) findViewById(R.id.editText);
+//        edt_pass = (EditText) findViewById(R.id.editText2);
 
         btnEnt = (Button)findViewById(R.id.button2);
         btnEnt.setOnClickListener(new View.OnClickListener() {

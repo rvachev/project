@@ -5,12 +5,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 public class ProfReg extends AppCompatActivity {
 
     private ImageButton btnProf, btnMap, btnInfo;
     private Button btnReg;
+    //private EditText edt_email, edt_nick, edt_pass, edt_pass_check;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +25,11 @@ public class ProfReg extends AppCompatActivity {
             Intent intent = new Intent(ProfReg.this, Profile.class);
             startActivity(intent);
         }
+
+//        edt_email = (EditText) findViewById(R.id.editText3);
+//        edt_nick = (EditText) findViewById(R.id.editText5);
+//        edt_pass = (EditText) findViewById(R.id.editText6);
+//        edt_pass_check = (EditText) findViewById(R.id.editText7);
 
         btnReg = (Button)findViewById(R.id.button5);
         btnReg.setOnClickListener(new View.OnClickListener() {

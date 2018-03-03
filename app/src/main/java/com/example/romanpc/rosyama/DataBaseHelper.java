@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,6 +57,17 @@ public class DataBaseHelper extends SQLiteOpenHelper{
         SQLiteDatabase writableDatabase = this.getWritableDatabase();
         String sql = "INSERT INTO pits (latitude, longitude) VALUES ("+lat+", "+lng+")";
         writableDatabase.execSQL(sql);
+    }
+
+    public int getId(){
+        SQLiteDatabase readableDatabase = this.getReadableDatabase();
+        String sql = "SELECT _id FROM pits";
+        Cursor cursor = readableDatabase.rawQuery(sql, null);
+        int id = 0;
+        while (cursor.moveToNext()){
+            id = cursor.getInt(0);
+        }
+        return id;
     }
 
     public ArrayList<HashMap<String,String>> getPits(){
