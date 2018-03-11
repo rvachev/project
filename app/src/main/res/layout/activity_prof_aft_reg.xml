@@ -6,44 +6,19 @@
     android:layout_height="match_parent"
     tools:context="com.example.romanpc.rosyama.ProfAftRegActivity">
 
-    <LinearLayout
-        android:id="@+id/toolbar"
-        android:layout_width="384dp"
-        android:layout_height="63dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:orientation="horizontal"
+    <android.support.design.widget.BottomNavigationView
+        android:id="@+id/navigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
+        android:background="?android:attr/windowBackground"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <ImageButton
-            android:id="@+id/imageButton"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/colorPrimaryDark"
-            app:srcCompat="@drawable/prof4" android:contentDescription="@string/todo13" />
-
-        <ImageButton
-            android:id="@+id/imageButton3"
-            style="@style/Base.Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/colorPrimary"
-            app:srcCompat="@drawable/map" android:contentDescription="@string/todo14" />
-
-        <ImageButton
-            android:id="@+id/imageButton2"
-            style="@style/Base.Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/colorPrimary"
-            app:srcCompat="@drawable/info4" android:contentDescription="@string/todo15" />
-    </LinearLayout>
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:itemTextColor="@android:color/black"
+        app:itemIconTint="@android:color/darker_gray"
+        app:menu="@menu/navigation" />
 
     <Button
         android:id="@+id/button3"

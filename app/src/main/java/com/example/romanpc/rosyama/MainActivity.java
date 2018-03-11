@@ -99,7 +99,11 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
-
+                if (BottomSheetBehavior.STATE_COLLAPSED == newState) {
+                    fab.animate().scaleX(0).scaleY(0).setDuration(300).start();
+                } else if (BottomSheetBehavior.STATE_HIDDEN == newState) {
+                    fab.animate().scaleX(1).scaleY(1).setDuration(300).start();
+                }
             }
 
             @Override
