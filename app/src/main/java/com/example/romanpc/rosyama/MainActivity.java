@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_FOR_GET_USER_LOCATION = 1;
     private FusedLocationProviderClient mFusedLocationClient;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,8 +67,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
         mapFragment.onCreate(savedInstanceState);
         mapFragment.onResume();
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
