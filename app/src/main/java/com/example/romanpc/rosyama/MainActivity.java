@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -47,13 +48,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_FOR_GET_USER_LOCATION = 1;
     private FusedLocationProviderClient mFusedLocationClient;
-    int transitionType = Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.map);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (this.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && this.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 this.requestPermissions(
@@ -61,9 +63,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         PERMISSION_REQUEST_FOR_GET_USER_LOCATION);
             }
         }
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        mapFragment.onCreate(savedInstanceState);
+        mapFragment.onResume();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -94,19 +96,27 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         mMap = googleMap;
-        DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
+        final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
         ArrayList<HashMap<String,String>> listPits = dataBaseHelper.getPits();
         int i = 0;
         while(i < listPits.size()){
             double lat = Double.parseDouble(listPits.get(i).get("Lat"));
             double lng = Double.parseDouble(listPits.get(i).get("Lng"));
-            mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
+            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
+            marker.setTag(listPits.get(i).get("_id"));
             i++;
         }
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                TextView lat = (TextView)findViewById(R.id.textView21);
+                TextView lng = (TextView)findViewById(R.id.textView22);
+                String pitId = (String)marker.getTag();
+                DataBaseHelper dataBaseHelper1 = new DataBaseHelper(MainActivity.this);
+                HashMap<String, String> pitInfo = dataBaseHelper1.getPitsById(pitId);
+                lat.setText(pitInfo.get("lat"));
+                lng.setText(pitInfo.get("lng"));
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 return false;
             }

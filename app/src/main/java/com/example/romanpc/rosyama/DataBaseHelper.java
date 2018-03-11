@@ -88,4 +88,13 @@ public class DataBaseHelper extends SQLiteOpenHelper{
         }
         return pitsList;
     }
+    public HashMap<String, String> getPitsById(String id){
+        SQLiteDatabase readableDatabase = this.getReadableDatabase();
+        String sql = "SELECT latitude, longitude FROM pits WHERE _id = ?";
+        Cursor cursor = readableDatabase.rawQuery(sql, new String[]{id});
+        HashMap<String, String> hashMap = new HashMap<>();
+        hashMap.put("lat", String.valueOf(cursor.getDouble(1)));
+        hashMap.put("lng", String.valueOf(cursor.getDouble(2)));
+        return hashMap;
+    }
 }
