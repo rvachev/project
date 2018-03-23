@@ -42,7 +42,7 @@
     <string name="todo13">TODO</string>
     <string name="todo14">TODO</string>
     <string name="todo15">TODO</string>
-    <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_main">Карта</string>
     <string name="title_activity_login">Sign in</string>
 
     <!-- Strings related to login -->

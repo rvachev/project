@@ -20,6 +20,11 @@
         app:itemIconTint="@android:color/darker_gray"
         app:menu="@menu/navigation" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
@@ -118,5 +123,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText7" />
+
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
