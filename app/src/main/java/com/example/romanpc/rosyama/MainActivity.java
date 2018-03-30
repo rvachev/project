@@ -1,6 +1,7 @@
 package com.example.romanpc.rosyama;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -45,11 +46,14 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, com.google.android.gms.location.LocationListener {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_FOR_GET_USER_LOCATION = 1;
     FloatingActionButton fab;
+    private GeofencingClient mGeofencingClient;
+    private ArrayList<Geofence> mGeofenceList;
+    private PendingIntent mGeofencePendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +133,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+
+
         mMap = googleMap;
+
+
+        mGeofencingClient = LocationServices.getGeofencingClient(this);
+        mGeofenceList.add(new Geofence.Builder()
+                .setRequestId("1")
+                .setCircularRegion(55.354, 73.765, 100)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                .build());
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofences(mGeofenceList);
+        builder.build();
+        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+        mGeofencePendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.
+                FLAG_UPDATE_CURRENT);
+
+
         final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
         ArrayList<HashMap<String,String>> listPits = dataBaseHelper.getPits();
         int i = 0;
@@ -140,6 +163,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             marker.setTag(listPits.get(i).get("_id"));
             i++;
         }
+
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
@@ -156,7 +180,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
+
         createLocationRequest();
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -178,10 +204,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mLocationRequest.setInterval(1500);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        Toast.makeText(this, "Локация изменилась", Toast.LENGTH_SHORT).show();
     }
 }
