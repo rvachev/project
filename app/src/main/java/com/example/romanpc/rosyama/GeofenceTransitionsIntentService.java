@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
+import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 
 
 @SuppressLint("Registered")
-public class GeofenceTransitionsIntentService extends IntentService {
+public class GeofenceTransitionsIntentService extends IntentService implements TextToSpeech.OnInitListener, TextToSpeech.OnUtteranceCompletedListener {
     TextToSpeech textToSpeech;
 
     public GeofenceTransitionsIntentService(String name) {
@@ -38,5 +39,24 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 textToSpeech.stop();
             }
         }
+    }
+
+    @Override
+    public void onInit(int status) {
+        textToSpeech.setOnUtteranceCompletedListener(this);
+    }
+
+    @Override
+    public void onUtteranceCompleted(String utteranceId) {
+
+    }
+
+    public void onDestroy(){
+        if(textToSpeech != null){
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+            textToSpeech = null;
+        }
+        super.onDestroy();
     }
 }

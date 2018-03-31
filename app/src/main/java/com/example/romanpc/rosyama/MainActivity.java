@@ -141,18 +141,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 
         mGeofencingClient = LocationServices.getGeofencingClient(this);
-        mGeofenceList.add(new Geofence.Builder()
-                .setRequestId("1")
-                .setCircularRegion(55.354, 73.765, 100)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-                .build());
-        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-        builder.addGeofences(mGeofenceList);
-        builder.build();
-        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
-        mGeofencePendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
+        mGeofenceList = new ArrayList<>();
 
         final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
         ArrayList<HashMap<String,String>> listPits = dataBaseHelper.getPits();
@@ -162,8 +151,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             double lng = Double.parseDouble(listPits.get(i).get("Lng"));
             Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
             marker.setTag(listPits.get(i).get("_id"));
+            mGeofenceList.add(new Geofence.Builder()
+                    .setRequestId(listPits.get(i).get("_id"))
+                    .setCircularRegion(lat, lng, 100)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                    .setExpirationDuration(-1)
+                    .build());
             i++;
         }
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+        builder.addGeofences(mGeofenceList);
+        builder.build();
+        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
+        mGeofencePendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {

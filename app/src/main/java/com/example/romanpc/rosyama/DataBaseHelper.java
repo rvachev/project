@@ -32,6 +32,9 @@ public class DataBaseHelper extends SQLiteOpenHelper{
                 ")";
         sqLiteDatabase.execSQL(sqlQuery1); //Этот метод позволяет выполнить любой SQL-запрос
 
+        String addPit = "INSERT INTO pits (latitude, longitude) VALUES (55.567332, 73.126748)";
+        sqLiteDatabase.execSQL(addPit);
+
         String sqlQuery2 = "CREATE TABLE cities (\n" +
                 "    _id  INTEGER PRIMARY KEY AUTOINCREMENT\n" +
                 "                 NOT NULL,\n" +
