@@ -21,6 +21,8 @@ public class ProfAftRegActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prof_aft_reg);
 
+
+
         Profile prof = new Profile();
         if(prof.isAuth == 1){
             Intent intent = new Intent(ProfAftRegActivity.this, Profile.class);

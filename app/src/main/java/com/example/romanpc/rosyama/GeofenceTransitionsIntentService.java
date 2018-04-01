@@ -23,10 +23,11 @@ public class GeofenceTransitionsIntentService extends IntentService implements T
 
     // ...
     protected void onHandleIntent(Intent intent) {
-        textToSpeech = new TextToSpeech(this, (TextToSpeech.OnInitListener) this);
+        textToSpeech = new TextToSpeech(this, this);
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
+            Toast.makeText(this, "Вы в зоне", Toast.LENGTH_SHORT).show();
             if(!textToSpeech.isSpeaking()){
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     textToSpeech.speak("Внимание! Впереди яма.", textToSpeech.QUEUE_ADD, null, "1");
