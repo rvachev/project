@@ -5,6 +5,7 @@ import android.app.IntentService;
 import android.content.Intent;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
@@ -25,6 +26,9 @@ public class GeofenceTransitionsIntentService extends IntentService implements T
     protected void onHandleIntent(Intent intent) {
         textToSpeech = new TextToSpeech(this, this);
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
+        if (geofencingEvent.hasError()) {
+            return;
+        }
         int geofenceTransition = geofencingEvent.getGeofenceTransition();
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
             Toast.makeText(this, "Вы в зоне", Toast.LENGTH_SHORT).show();
