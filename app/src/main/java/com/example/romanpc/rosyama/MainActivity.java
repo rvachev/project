@@ -52,13 +52,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     FloatingActionButton fab;
     private ArrayList<Geofence> mGeofenceList;
     private PendingIntent mGeofencePendingIntent;
-    private TextToSpeech toSpeech;
+    private static TextToSpeech tts;
     private int result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+
+            }
+        });
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         ActionBar actionBar = getSupportActionBar();
@@ -227,41 +234,17 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onComplete(@NonNull Task<Void> task) {
         if (task.isSuccessful()) {
-            Toast.makeText(this, "Успешно добавлено", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Успешно добавлено", Toast.LENGTH_SHORT).show();
         }else {
             Toast.makeText(this, "BBBBBB", Toast.LENGTH_SHORT).show();
         }
     }
 
-//    public void sayResult(){
-//        toSpeech = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
-//            @Override
-//            public void onInit(int i) {
-//                if(i == TextToSpeech.SUCCESS){
-//                    Locale myLocale = new Locale("ru","RU");
-//                    result = toSpeech.setLanguage(myLocale);
-//                }else{
-//                    Toast.makeText(MainActivity.this, "Эта функция не поддерживается", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
-//        if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
-//            Toast.makeText(MainActivity.this, "Эта функция не поддерживается", Toast.LENGTH_SHORT).show();
-//        }else{
-//            toSpeech.speak("Внимание! Впереди яма", TextToSpeech.QUEUE_FLUSH, null);
-//        }
-//        if(!toSpeech.isSpeaking()){
-//            if(toSpeech != null){
-//                toSpeech.stop();
-//                toSpeech.shutdown();
-//            }
-//        }
-//    }
-
     public static class GeofenceBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
+            tts.speak("Внимание! Впереди яма!", TextToSpeech.QUEUE_FLUSH, null);
+            //Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
         }
     }
 }
