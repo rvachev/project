@@ -36,6 +36,11 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+        <receiver
+            android:name="MainActivity$GeofenceBroadcastReceiver"
+            android:exported="true"
+            android:enabled="true" />
+
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps">

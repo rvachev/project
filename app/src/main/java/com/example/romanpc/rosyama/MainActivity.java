@@ -28,7 +28,6 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingEvent;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -40,13 +39,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, OnCompleteListener<Void> {
 
@@ -55,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     FloatingActionButton fab;
     private ArrayList<Geofence> mGeofenceList;
     private PendingIntent mGeofencePendingIntent;
+    private TextToSpeech toSpeech;
+    private int result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,22 +147,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
         geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
 
-//        Geofence.Builder geofenceBuilder = new Geofence.Builder();
-//        geofenceBuilder.setCircularRegion(55.041082, 73.323116, 100);
-//        geofenceBuilder.setRequestId("111");
-//        geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
-//        geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
-//        Geofence geofence = geofenceBuilder.build();
-
-//        GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofence(geofence);
-//        GeofencingRequest geofencingRequest = addGeofence.build();
-
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//        client.addGeofences(geofencingRequest, getGeofencePendingIntent())
-//                .addOnCompleteListener(this);
-
         final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
         ArrayList<HashMap<String, String>> listPits = dataBaseHelper.getPits();
         int i = 0;
@@ -229,8 +212,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return mGeofencePendingIntent;
         }
         Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
-        // addGeofences() and removeGeofences().
         mGeofencePendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return mGeofencePendingIntent;
     }
@@ -246,53 +227,41 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onComplete(@NonNull Task<Void> task) {
         if (task.isSuccessful()) {
-            Toast.makeText(this, "AAAAAA", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Успешно добавлено", Toast.LENGTH_SHORT).show();
         }else {
             Toast.makeText(this, "BBBBBB", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static class GeofenceBroadcastReceiver extends BroadcastReceiver implements TextToSpeech.OnInitListener, TextToSpeech.OnUtteranceCompletedListener {
-        TextToSpeech textToSpeech;
+//    public void sayResult(){
+//        toSpeech = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
+//            @Override
+//            public void onInit(int i) {
+//                if(i == TextToSpeech.SUCCESS){
+//                    Locale myLocale = new Locale("ru","RU");
+//                    result = toSpeech.setLanguage(myLocale);
+//                }else{
+//                    Toast.makeText(MainActivity.this, "Эта функция не поддерживается", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
+//        if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+//            Toast.makeText(MainActivity.this, "Эта функция не поддерживается", Toast.LENGTH_SHORT).show();
+//        }else{
+//            toSpeech.speak("Внимание! Впереди яма", TextToSpeech.QUEUE_FLUSH, null);
+//        }
+//        if(!toSpeech.isSpeaking()){
+//            if(toSpeech != null){
+//                toSpeech.stop();
+//                toSpeech.shutdown();
+//            }
+//        }
+//    }
 
+    public static class GeofenceBroadcastReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            textToSpeech = new TextToSpeech(context, this);
-            if(!textToSpeech.isSpeaking()){
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    textToSpeech.speak("Внимание! Впереди яма", textToSpeech.QUEUE_ADD, null, "1");
-                }else{
-                    HashMap<String, String> stringStringHashMap = new HashMap<>();
-                    stringStringHashMap.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, "Внимание! Впереди яма.");
-                    textToSpeech.speak("Внимание! Впереди яма", textToSpeech.QUEUE_ADD, stringStringHashMap);
-                }
-            }else{
-                onDestroy();
-            }
             Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onInit(int status) {
-            textToSpeech.setOnUtteranceCompletedListener(this);
-        }
-
-        @Override
-        public void onUtteranceCompleted(String utteranceId) {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Toast.makeText(, "Completed!", Toast.LENGTH_SHORT).show();
-//                }
-//            });
-        }
-
-        protected void onDestroy(){
-            if(textToSpeech != null){
-                textToSpeech.stop();
-                textToSpeech.shutdown();
-                textToSpeech = null;
-            }
         }
     }
 }

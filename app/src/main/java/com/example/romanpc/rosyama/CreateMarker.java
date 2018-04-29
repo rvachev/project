@@ -1,15 +1,13 @@
 package com.example.romanpc.rosyama;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +16,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -36,6 +33,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private TextView txtcoords;
     private double lat, lng;
+    private int hasMarker = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +96,13 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
+                if(hasMarker == 0){
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
+                    hasMarker++;
+                }else{
+                    mMap.clear();
+                    Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
+                }
                 lat = latLng.latitude;
                 lng = latLng.longitude;
                 txtcoords.setText(String.valueOf(lat) + "\n" + String.valueOf(lng));
@@ -109,8 +113,6 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location location) {
-//                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15);
-//                        mMap.animateCamera(cameraUpdate);
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 20));
                     }
                 });
