@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,9 +32,10 @@ import java.util.HashMap;
 public class CreateMarker extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private TextView txtcoords;
     private double lat, lng;
     private int hasMarker = 0;
+    private RatingBar ratingBar;
+    private float ratingPit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,14 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
+        ratingBar = (RatingBar)findViewById(R.id.ratebar);
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                ratingPit = rating;
+            }
+        });
+
         MapView mapView = (MapView) findViewById(R.id.mapView);
         mapView.getMapAsync(this);
         mapView.onCreate(savedInstanceState);
@@ -55,7 +65,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 if(lat != 0.0 && lng != 0.0) {
                     DataBaseHelper dataBaseHelper = new DataBaseHelper(CreateMarker.this);
-                    dataBaseHelper.addPit(lat, lng);
+                    dataBaseHelper.addPit(lat, lng, ratingPit);
                     Intent intent = new Intent(CreateMarker.this, MainActivity.class);
                     startActivity(intent);
                 }else{
@@ -77,18 +87,18 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        txtcoords = (TextView) findViewById(R.id.textView18);
         mMap = googleMap;
-        final DataBaseHelper dataBaseHelper = new DataBaseHelper(CreateMarker.this);
-        ArrayList<HashMap<String,String>> listPits = dataBaseHelper.getPits();
+//        final DataBaseHelper dataBaseHelper = new DataBaseHelper(CreateMarker.this);
+//        ArrayList<HashMap<String,String>> listPits = dataBaseHelper.getPits();
         int i = 0;
-        while(i < listPits.size()){
-            double lat = Double.parseDouble(listPits.get(i).get("Lat"));
-            double lng = Double.parseDouble(listPits.get(i).get("Lng"));
-            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
-            marker.setTag(listPits.get(i).get("_id"));
-            i++;
-        }
+
+//        while(i < listPits.size()){
+//            double lat = Double.parseDouble(listPits.get(i).get("Lat"));
+//            double lng = Double.parseDouble(listPits.get(i).get("Lng"));
+//            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
+//            marker.setTag(listPits.get(i).get("_id"));
+//            i++;
+//        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
@@ -105,7 +115,6 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 lat = latLng.latitude;
                 lng = latLng.longitude;
-                txtcoords.setText(String.valueOf(lat) + "\n" + String.valueOf(lng));
             }
         });
         FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);

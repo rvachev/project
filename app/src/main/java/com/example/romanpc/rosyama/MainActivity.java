@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -53,7 +54,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<Geofence> mGeofenceList;
     private PendingIntent mGeofencePendingIntent;
     private static TextToSpeech tts;
-    private int result;
+    private RatingBar ratingBar;
+    private float rating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +118,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             case PERMISSION_REQUEST_FOR_GET_USER_LOCATION:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     if (this.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && this.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(this, "Пользователь включил определение местоположеия", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this, MainActivity.class);
+                        startActivity(intent);
                     }
                 }
         }
@@ -124,6 +127,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        ratingBar = (RatingBar)findViewById(R.id.ratingBar2);
         LinearLayout llBottomSheet = (LinearLayout) findViewById(R.id.bottom_sheet);
         final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -160,6 +164,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         while (i < listPits.size()) {
             double lat = Double.parseDouble(listPits.get(i).get("Lat"));
             double lng = Double.parseDouble(listPits.get(i).get("Lng"));
+            rating = Float.parseFloat(listPits.get(i).get("rat"));
             Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
             marker.setTag(listPits.get(i).get("_id"));
             Geofence.Builder geofenceBuilder = new Geofence.Builder();
@@ -190,6 +195,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 HashMap<String, String> pitInfo = dataBaseHelper1.getPitsById(pitId);
                 lat.setText(pitInfo.get("lat"));
                 lng.setText(pitInfo.get("lng"));
+                rating = Float.parseFloat(pitInfo.get("rat"));
+                ratingBar.setRating(rating);
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 return false;
             }
@@ -214,7 +221,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private PendingIntent getGeofencePendingIntent() {
-        // Reuse the PendingIntent if we already have it.
         if (mGeofencePendingIntent != null) {
             return mGeofencePendingIntent;
         }

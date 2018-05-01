@@ -27,7 +27,8 @@ public class DataBaseHelper extends SQLiteOpenHelper{
                 "                      NOT NULL,\n" +
                 "    latitude  REAL,\n" +
                 "    longitude REAL,\n" +
-                "    city_id   INTEGER\n" +
+                "    city_id   INTEGER,\n" +
+                "    rating   REAL,\n" +
                 "    exist INTEGER\n" +
                 ")";
         sqLiteDatabase.execSQL(sqlQuery1); //Этот метод позволяет выполнить любой SQL-запрос
@@ -55,10 +56,10 @@ public class DataBaseHelper extends SQLiteOpenHelper{
 
     }
 
-    public void addPit(double lat, double lng){
+    public void addPit(double lat, double lng, double rating){
         //Объект, позволяющий записывать БД
         SQLiteDatabase writableDatabase = this.getWritableDatabase();
-        String sql = "INSERT INTO pits (latitude, longitude) VALUES ("+lat+", "+lng+")";
+        String sql = "INSERT INTO pits (latitude, longitude, rating) VALUES ("+lat+", "+lng+", "+rating+")";
         writableDatabase.execSQL(sql);
     }
 
@@ -76,17 +77,19 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     public ArrayList<HashMap<String,String>> getPits(){
         //получение объекта, с помощью которого вы можете выполнять запросы к БД
         SQLiteDatabase readableDatabase = this.getReadableDatabase();
-        String sql = "SELECT _id, latitude, longitude FROM pits";
+        String sql = "SELECT _id, latitude, longitude, rating FROM pits";
         Cursor cursor = readableDatabase.rawQuery(sql, null);
         ArrayList<HashMap<String,String>> pitsList = new ArrayList<>();
         while(cursor.moveToNext()) {
             int id = cursor.getInt(0);
             double latitude = cursor.getDouble(1);
             double longitude = cursor.getDouble(2);
+            float rating = cursor.getFloat(3);
             HashMap<String, String> pit = new HashMap<>();
             pit.put("_id", Integer.toString(id));
             pit.put("Lat", Double.toString(latitude));
             pit.put("Lng", Double.toString(longitude));
+            pit.put("rat", Double.toString(rating));
             pitsList.add(pit);
         }
         return pitsList;
@@ -94,14 +97,16 @@ public class DataBaseHelper extends SQLiteOpenHelper{
 
     public HashMap<String, String> getPitsById(String id){
         SQLiteDatabase readableDatabase = this.getReadableDatabase();
-        String sql = "SELECT latitude, longitude FROM pits WHERE _id = ?";
+        String sql = "SELECT latitude, longitude, rating FROM pits WHERE _id = ?";
         Cursor cursor = readableDatabase.rawQuery(sql, new String[]{id});
         HashMap<String, String> hashMap = new HashMap<>();
         while(cursor.moveToNext()) {
             double lat = cursor.getDouble(0);
             double lng = cursor.getDouble(1);
+            float rating = cursor.getFloat(2);
             hashMap.put("lat", Double.toString(lat));
             hashMap.put("lng", Double.toString(lng));
+            hashMap.put("rat", Float.toString(rating));
         }
         return hashMap;
     }
