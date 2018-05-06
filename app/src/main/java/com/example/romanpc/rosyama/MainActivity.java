@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (task.isSuccessful()) {
             //Toast.makeText(this, "Успешно добавлено", Toast.LENGTH_SHORT).show();
         }else {
-            Toast.makeText(this, "BBBBBB", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Возникла проблема", Toast.LENGTH_SHORT).show();
         }
     }
 

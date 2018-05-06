@@ -1,27 +1,28 @@
 package com.example.romanpc.rosyama;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageButton;
+import android.widget.TextView;
+
+import java.util.HashMap;
 
 public class Profile extends AppCompatActivity {
 
-    public static int isAuth = 0;
+    private TextView textView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        if(isAuth == 0){
-            Intent intent = new Intent(Profile.this, ProfAftRegActivity.class);
-            startActivity(intent);
-        }
+        textView = (TextView)findViewById(R.id.textView7);
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
+        HashMap<String, String> hashMap = dataBaseHelper.readUserInfo();
+        textView.setText(hashMap.get("name"));
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {

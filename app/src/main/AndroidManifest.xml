@@ -61,12 +61,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ProfEnter"
-            android:label="Вход" />
-        <activity
-            android:name=".ProfReg"
-            android:label="Регистрация" />
-        <activity
             android:name=".Profile"
             android:label="Профиль" />
         <activity

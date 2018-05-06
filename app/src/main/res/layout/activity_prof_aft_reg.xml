@@ -26,6 +26,7 @@
         android:gravity="center"
         android:orientation="vertical">
 
+
         <Button
             android:id="@+id/button3"
             style="@style/Widget.AppCompat.Button.Colored"
@@ -44,17 +45,9 @@
 
         <Button
             android:id="@+id/button4"
-            style="@style/Widget.AppCompat.Button.Colored"
-            android:layout_width="165dp"
-            android:layout_height="66dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/sign_up_acc"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.502"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button3" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="В профиль" />
 
     </LinearLayout>
 

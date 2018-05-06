@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,6 +48,14 @@ public class DataBaseHelper extends SQLiteOpenHelper{
                 "    photo TEXT\n" +
                 ")";
         sqLiteDatabase.execSQL(sqlQuery3);
+
+        String sqlQuery4 = "CREATE TABLE user (\n" +
+                "    _id   INTEGER PRIMARY KEY AUTOINCREMENT\n" +
+                "                  NOT NULL,\n" +
+                "    name TEXT,\n" +
+                "    photo TEXT\n" +
+                ")";
+        sqLiteDatabase.execSQL(sqlQuery4);
     }
 
     @Override
@@ -107,6 +114,26 @@ public class DataBaseHelper extends SQLiteOpenHelper{
             hashMap.put("lat", Double.toString(lat));
             hashMap.put("lng", Double.toString(lng));
             hashMap.put("rat", Float.toString(rating));
+        }
+        return hashMap;
+    }
+
+    public void writeUserInfo(String name, String photo){
+        SQLiteDatabase writableDatabase = this.getWritableDatabase();
+        String sql = "INSERT INTO user (name, photo) VALUES ("+name+", "+photo+")";
+        writableDatabase.execSQL(sql);
+    }
+
+    public HashMap<String, String> readUserInfo(){
+        SQLiteDatabase readableDatabase = this.getReadableDatabase();
+        String sql = "SELECT name, photo FROM user";
+        Cursor cursor = readableDatabase.rawQuery(sql, null);
+        HashMap<String, String> hashMap = new HashMap<>();
+        while (cursor.moveToNext()){
+            String name = cursor.getString(0);
+            String photo = cursor.getString(1);
+            hashMap.put("name", name);
+            hashMap.put("photo", photo);
         }
         return hashMap;
     }
