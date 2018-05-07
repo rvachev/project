@@ -28,6 +28,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-maps:15.0.1'
     compile 'com.google.android.gms:play-services-location:15.0.1'
     compile 'com.google.android.gms:play-services-auth:15.0.1'
+    compile 'com.google.android.gms:play-services-base:15.0.1'
+    compile 'com.google.gms:google-services:3.3.0'
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support:design:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
