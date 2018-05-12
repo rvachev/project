@@ -118,10 +118,10 @@ public class DataBaseHelper extends SQLiteOpenHelper{
         return hashMap;
     }
 
-    public void writeUserInfo(String username){
+    public void writeUserInfo(String username, String photo){
         SQLiteDatabase writableDatabase = this.getWritableDatabase();
-        String sql = "INSERT INTO user (name) VALUES ("+username+")";
-        writableDatabase.execSQL(sql);
+        String sql = "INSERT INTO user (name, photo) VALUES (?, ?)";
+        writableDatabase.execSQL(sql, new String[]{username, photo});
     }
 
     public HashMap<String, String> readUserInfo(){

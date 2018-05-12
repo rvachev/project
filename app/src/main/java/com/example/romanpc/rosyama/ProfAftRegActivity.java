@@ -20,12 +20,15 @@ import com.google.android.gms.tasks.Task;
 
 public class ProfAftRegActivity extends AppCompatActivity {
 
-    private Button btnEnt, btnProf;
     private GoogleSignInClient mGoogleSignInClient;
 
     @Override
     protected void onPostCreate(@Nullable Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onBackPressed() {
     }
 
     @Override
@@ -38,23 +41,8 @@ public class ProfAftRegActivity extends AppCompatActivity {
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        btnProf = (Button)findViewById(R.id.button4);
-        btnProf.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(ProfAftRegActivity.this, Profile.class);
-                startActivity(intent);
-            }
-        });
-
-        btnEnt = (Button)findViewById(R.id.button3);
-        btnEnt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-                startActivityForResult(signInIntent, 123);
-            }
-        });
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, 123);
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -85,17 +73,16 @@ public class ProfAftRegActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == 123) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             GoogleSignInAccount account = handleSignInResult(task);
             DataBaseHelper dataBaseHelper = new DataBaseHelper(ProfAftRegActivity.this);
-            dataBaseHelper.writeUserInfo(account.getGivenName());
+            if(account.getGivenName() != null && account.getPhotoUrl() != null) {
+                dataBaseHelper.writeUserInfo(account.getGivenName(), account.getPhotoUrl().toString());
+            }else if(account.getPhotoUrl() == null){
+                dataBaseHelper.writeUserInfo(account.getGivenName(), null);
+            }
             Intent intent = new Intent(ProfAftRegActivity.this, Profile.class);
-            intent.putExtra("photo", account.getPhotoUrl().toString());
             startActivity(intent);
         }
     }

@@ -11,6 +11,8 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,15 +30,13 @@ public class Profile extends AppCompatActivity {
 
         imageView = (ImageView)findViewById(R.id.imageView);
 
-        Intent intent = getIntent();
-        String photo = intent.getStringExtra("photo");
-        URL newurl = null;
-        try {
-            newurl = new URL(photo);
-            Bitmap bitmap = BitmapFactory.decodeStream(newurl.openConnection().getInputStream());
-            imageView.setImageBitmap(bitmap);
-        }catch (IOException e) {
-            e.printStackTrace();
+        DataBaseHelper dataBaseHelper1 = new DataBaseHelper(this);
+        HashMap<String, String> userInfo = dataBaseHelper1.readUserInfo();
+
+        String photo = userInfo.get("photo");
+
+        if(photo != null) {
+            Picasso.with(this).load(photo).into(imageView);
         }
 
         textView = (TextView)findViewById(R.id.textView7);
