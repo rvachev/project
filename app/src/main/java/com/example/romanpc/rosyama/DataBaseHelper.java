@@ -1,26 +1,33 @@
 package com.example.romanpc.rosyama;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class DataBaseHelper extends SQLiteOpenHelper{
+
+    private Context context;
 
     public DataBaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
 
-    public DataBaseHelper(Context context){
+    public DataBaseHelper(Context context) {
         super(context, "database.db", null, 1);
+        this.context = context;
     }
 
     //Выполняется при создании базы данных, нужно написать код для создания таблиц
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+
         String sqlQuery1 = "CREATE TABLE pits (\n" +
                 "    _id       INTEGER PRIMARY KEY AUTOINCREMENT\n" +
                 "                      NOT NULL,\n" +
@@ -56,6 +63,19 @@ public class DataBaseHelper extends SQLiteOpenHelper{
                 "    photo TEXT\n" +
                 ")";
         sqLiteDatabase.execSQL(sqlQuery4);
+
+        AssetManager assetManager = context.getAssets();
+        try {
+            InputStream inputStream = assetManager.open("regions.txt");
+            Scanner scanner = new Scanner(inputStream);
+            while (scanner.hasNextLine()){
+                String sql = scanner.nextLine();
+                sqLiteDatabase.execSQL(sql);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -136,5 +156,17 @@ public class DataBaseHelper extends SQLiteOpenHelper{
             hashMap.put("photo", photo);
         }
         return hashMap;
+    }
+
+    public ArrayList<String> getCities(){
+        SQLiteDatabase readableDatabase = this.getReadableDatabase();
+        String sql = "SELECT region FROM regions ORDER BY region";
+        Cursor cursor = readableDatabase.rawQuery(sql, null);
+        ArrayList<String> list = new ArrayList<>();
+        while(cursor.moveToNext()){
+            String region = cursor.getString(0);
+            list.add(region);
+        }
+        return list;
     }
 }
