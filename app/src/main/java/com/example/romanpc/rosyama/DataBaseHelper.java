@@ -1,19 +1,21 @@
 package com.example.romanpc.rosyama;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Scanner;
 
 public class DataBaseHelper extends SQLiteOpenHelper{
 
     private Context context;
+    static String DB_PATH = "/data/data/com.example.romanpc.rosyama/databases/";
+    static String DB_NAME = "database.db";
 
     public DataBaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -27,34 +29,35 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     //Выполняется при создании базы данных, нужно написать код для создания таблиц
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        copyDataBase();
 
-        String sqlQuery1 = "CREATE TABLE pits (\n" +
-                "    _id       INTEGER PRIMARY KEY AUTOINCREMENT\n" +
-                "                      NOT NULL,\n" +
-                "    latitude  REAL,\n" +
-                "    longitude REAL,\n" +
-                "    city_id   INTEGER,\n" +
-                "    rating   REAL,\n" +
-                "    exist INTEGER\n" +
-                ")";
-        sqLiteDatabase.execSQL(sqlQuery1); //Этот метод позволяет выполнить любой SQL-запрос
-
-        String addPit = "INSERT INTO pits (latitude, longitude) VALUES (55.567332, 73.126748)";
-        sqLiteDatabase.execSQL(addPit);
-
-        String sqlQuery2 = "CREATE TABLE cities (\n" +
-                "    _id  INTEGER PRIMARY KEY AUTOINCREMENT\n" +
-                "                 NOT NULL,\n" +
-                "    city TEXT\n" +
-                ")";
-        sqLiteDatabase.execSQL(sqlQuery2);
-
-        String sqlQuery3 = "CREATE TABLE photos (\n" +
-                "    _id   INTEGER PRIMARY KEY AUTOINCREMENT\n" +
-                "                  NOT NULL,\n" +
-                "    photo TEXT\n" +
-                ")";
-        sqLiteDatabase.execSQL(sqlQuery3);
+//        String sqlQuery1 = "CREATE TABLE pits (\n" +
+//                "    _id       INTEGER PRIMARY KEY AUTOINCREMENT\n" +
+//                "                      NOT NULL,\n" +
+//                "    latitude  REAL,\n" +
+//                "    longitude REAL,\n" +
+//                "    city_id   INTEGER,\n" +
+//                "    rating   REAL,\n" +
+//                "    exist INTEGER\n" +
+//                ")";
+//        sqLiteDatabase.execSQL(sqlQuery1); //Этот метод позволяет выполнить любой SQL-запрос
+//
+//        String addPit = "INSERT INTO pits (latitude, longitude) VALUES (55.567332, 73.126748)";
+//        sqLiteDatabase.execSQL(addPit);
+//
+//        String sqlQuery2 = "CREATE TABLE cities (\n" +
+//                "    _id  INTEGER PRIMARY KEY AUTOINCREMENT\n" +
+//                "                 NOT NULL,\n" +
+//                "    city TEXT\n" +
+//                ")";
+//        sqLiteDatabase.execSQL(sqlQuery2);
+//
+//        String sqlQuery3 = "CREATE TABLE photos (\n" +
+//                "    _id   INTEGER PRIMARY KEY AUTOINCREMENT\n" +
+//                "                  NOT NULL,\n" +
+//                "    photo TEXT\n" +
+//                ")";
+//        sqLiteDatabase.execSQL(sqlQuery3);
 
         String sqlQuery4 = "CREATE TABLE user (\n" +
                 "    _id   INTEGER PRIMARY KEY AUTOINCREMENT\n" +
@@ -64,17 +67,17 @@ public class DataBaseHelper extends SQLiteOpenHelper{
                 ")";
         sqLiteDatabase.execSQL(sqlQuery4);
 
-        AssetManager assetManager = context.getAssets();
-        try {
-            InputStream inputStream = assetManager.open("regions.txt");
-            Scanner scanner = new Scanner(inputStream);
-            while (scanner.hasNextLine()){
-                String sql = scanner.nextLine();
-                sqLiteDatabase.execSQL(sql);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//        AssetManager assetManager = context.getAssets();
+//        try {
+//            InputStream inputStream = assetManager.open("regions.txt");
+//            Scanner scanner = new Scanner(inputStream);
+//            while (scanner.hasNextLine()){
+//                String sql = scanner.nextLine();
+//                sqLiteDatabase.execSQL(sql);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
     }
 
@@ -104,7 +107,7 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     public ArrayList<HashMap<String,String>> getPits(){
         //получение объекта, с помощью которого вы можете выполнять запросы к БД
         SQLiteDatabase readableDatabase = this.getReadableDatabase();
-        String sql = "SELECT _id, latitude, longitude, rating FROM pits";
+        String sql = "SELECT _id, latitude, longitude FROM pits";
         Cursor cursor = readableDatabase.rawQuery(sql, null);
         ArrayList<HashMap<String,String>> pitsList = new ArrayList<>();
         while(cursor.moveToNext()) {
@@ -117,8 +120,10 @@ public class DataBaseHelper extends SQLiteOpenHelper{
             pit.put("Lat", Double.toString(latitude));
             pit.put("Lng", Double.toString(longitude));
             pit.put("rat", Double.toString(rating));
+
             pitsList.add(pit);
         }
+
         return pitsList;
     }
 
@@ -168,5 +173,28 @@ public class DataBaseHelper extends SQLiteOpenHelper{
             list.add(region);
         }
         return list;
+    }
+
+    public void copyDataBase() {
+        try{
+            String outFileName = DB_PATH + DB_NAME;
+
+            OutputStream myOutput = new FileOutputStream(outFileName);
+
+            byte[] buffer = new byte[1024];
+            int length;
+
+            InputStream myInput = context.getAssets().open("database.s3db");
+            while ((length = myInput.read(buffer)) > 0) {
+                myOutput.write(buffer, 0, length);
+            }
+            myInput.close();
+
+            myOutput.flush();
+            myOutput.close();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }
