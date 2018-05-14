@@ -29,6 +29,7 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -37,6 +38,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -157,35 +159,35 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         GeofencingClient client = LocationServices.getGeofencingClient(this);
 
-//        GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
-//        geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
-//
-//        final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
-//        ArrayList<HashMap<String, String>> listPits = dataBaseHelper.getPits();
-//        int i = 0;
-//        while (i < listPits.size()) {
-//            double lat = Double.parseDouble(listPits.get(i).get("Lat"));
-//            double lng = Double.parseDouble(listPits.get(i).get("Lng"));
-//            rating = Float.parseFloat(listPits.get(i).get("rat"));
-//            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
-//            marker.setTag(listPits.get(i).get("_id"));
-//            Geofence.Builder geofenceBuilder = new Geofence.Builder();
-//            geofenceBuilder.setCircularRegion(lat, lng, 100);
-//            geofenceBuilder.setRequestId(listPits.get(i).get("_id"));
-//            geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
-//            geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
-//            Geofence geofence = geofenceBuilder.build();
-//            mGeofenceList.add(geofence);
-//            i++;
-//        }
-//        GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofences(mGeofenceList);
-//        GeofencingRequest geofencingRequest = addGeofence.build();
-//
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//        client.addGeofences(geofencingRequest, getGeofencePendingIntent())
-//                .addOnCompleteListener(this);
+        GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
+        geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
+
+        final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
+        ArrayList<HashMap<String, String>> listPits = dataBaseHelper.getPits();
+        int i = 0;
+        while (i < listPits.size()) {
+            double lat = Double.parseDouble(listPits.get(i).get("Lat"));
+            double lng = Double.parseDouble(listPits.get(i).get("Lng"));
+            rating = Float.parseFloat(listPits.get(i).get("rat"));
+            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
+            marker.setTag(listPits.get(i).get("_id"));
+            Geofence.Builder geofenceBuilder = new Geofence.Builder();
+            geofenceBuilder.setCircularRegion(lat, lng, 100);
+            geofenceBuilder.setRequestId(listPits.get(i).get("_id"));
+            geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+            geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
+            Geofence geofence = geofenceBuilder.build();
+            mGeofenceList.add(geofence);
+            i++;
+        }
+        GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofences(mGeofenceList);
+        GeofencingRequest geofencingRequest = addGeofence.build();
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        client.addGeofences(geofencingRequest, getGeofencePendingIntent())
+                .addOnCompleteListener(this);
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override

@@ -1,6 +1,7 @@
 package com.example.romanpc.rosyama;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -10,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class DataBaseHelper extends SQLiteOpenHelper{
 
@@ -31,33 +33,33 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         copyDataBase();
 
-//        String sqlQuery1 = "CREATE TABLE pits (\n" +
-//                "    _id       INTEGER PRIMARY KEY AUTOINCREMENT\n" +
-//                "                      NOT NULL,\n" +
-//                "    latitude  REAL,\n" +
-//                "    longitude REAL,\n" +
-//                "    city_id   INTEGER,\n" +
-//                "    rating   REAL,\n" +
-//                "    exist INTEGER\n" +
-//                ")";
-//        sqLiteDatabase.execSQL(sqlQuery1); //Этот метод позволяет выполнить любой SQL-запрос
-//
-//        String addPit = "INSERT INTO pits (latitude, longitude) VALUES (55.567332, 73.126748)";
-//        sqLiteDatabase.execSQL(addPit);
-//
-//        String sqlQuery2 = "CREATE TABLE cities (\n" +
-//                "    _id  INTEGER PRIMARY KEY AUTOINCREMENT\n" +
-//                "                 NOT NULL,\n" +
-//                "    city TEXT\n" +
-//                ")";
-//        sqLiteDatabase.execSQL(sqlQuery2);
-//
-//        String sqlQuery3 = "CREATE TABLE photos (\n" +
-//                "    _id   INTEGER PRIMARY KEY AUTOINCREMENT\n" +
-//                "                  NOT NULL,\n" +
-//                "    photo TEXT\n" +
-//                ")";
-//        sqLiteDatabase.execSQL(sqlQuery3);
+        String sqlQuery1 = "CREATE TABLE pits (\n" +
+                "    _id       INTEGER PRIMARY KEY AUTOINCREMENT\n" +
+                "                      NOT NULL,\n" +
+                "    latitude  REAL,\n" +
+                "    longitude REAL,\n" +
+                "    city_id   INTEGER,\n" +
+                "    rating   REAL,\n" +
+                "    exist INTEGER\n" +
+                ")";
+        sqLiteDatabase.execSQL(sqlQuery1); //Этот метод позволяет выполнить любой SQL-запрос
+
+        String addPit = "INSERT INTO pits (latitude, longitude) VALUES (55.567332, 73.126748)";
+        sqLiteDatabase.execSQL(addPit);
+
+        String sqlQuery2 = "CREATE TABLE cities (\n" +
+                "    _id  INTEGER PRIMARY KEY AUTOINCREMENT\n" +
+                "                 NOT NULL,\n" +
+                "    city TEXT\n" +
+                ")";
+        sqLiteDatabase.execSQL(sqlQuery2);
+
+        String sqlQuery3 = "CREATE TABLE photos (\n" +
+                "    _id   INTEGER PRIMARY KEY AUTOINCREMENT\n" +
+                "                  NOT NULL,\n" +
+                "    photo TEXT\n" +
+                ")";
+        sqLiteDatabase.execSQL(sqlQuery3);
 
         String sqlQuery4 = "CREATE TABLE user (\n" +
                 "    _id   INTEGER PRIMARY KEY AUTOINCREMENT\n" +
@@ -67,17 +69,17 @@ public class DataBaseHelper extends SQLiteOpenHelper{
                 ")";
         sqLiteDatabase.execSQL(sqlQuery4);
 
-//        AssetManager assetManager = context.getAssets();
-//        try {
-//            InputStream inputStream = assetManager.open("regions.txt");
-//            Scanner scanner = new Scanner(inputStream);
-//            while (scanner.hasNextLine()){
-//                String sql = scanner.nextLine();
-//                sqLiteDatabase.execSQL(sql);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        AssetManager assetManager = context.getAssets();
+        try {
+            InputStream inputStream = assetManager.open("regions.txt");
+            Scanner scanner = new Scanner(inputStream);
+            while (scanner.hasNextLine()){
+                String sql = scanner.nextLine();
+                sqLiteDatabase.execSQL(sql);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
