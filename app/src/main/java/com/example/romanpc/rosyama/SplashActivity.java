@@ -8,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.romanpc.api.ApiService;
 
@@ -23,7 +24,7 @@ import retrofit2.Response;
 public class SplashActivity extends AppCompatActivity {
 
     private Spinner spinner;
-    private Button button;
+    private Button button, continuebtn;
     private String region;
 
     @Override
@@ -32,6 +33,10 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
+        int i = dataBaseHelper.dataExist();
+        if(i > 0){
+            startActivity(new Intent(this, MainActivity.class));
+        }
         ArrayList<String> list = dataBaseHelper.getCities();
 
         spinner = (Spinner)findViewById(R.id.spinner);
@@ -51,6 +56,8 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
+        continuebtn = (Button)findViewById(R.id.button3);
+        continuebtn.setEnabled(false);
         button = (Button)findViewById(R.id.button2);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +80,7 @@ public class SplashActivity extends AppCompatActivity {
                                 }
                             }
                             dataBaseHelper1.addPit(Integer.parseInt(split[0]), Double.parseDouble(split[3]), Double.parseDouble(split[4]), split[2], status, photo);
-                            //System.out.println(row);
+                            continuebtn.setEnabled(true);
                         }
                     }
 
@@ -82,7 +89,12 @@ public class SplashActivity extends AppCompatActivity {
 
                     }
                 });
-                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            }
+        });
+        continuebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
             }
         });
     }

@@ -142,4 +142,13 @@ public class DataBaseHelper extends SQLiteOpenHelper{
         String sql = "DELETE FROM pits";
         writableDatabase.execSQL(sql);
     }
+
+    public int dataExist(){
+        SQLiteDatabase readableDatabase = this.getReadableDatabase();
+        String sql = "SELECT COUNT(*) FROM pits";
+        Cursor cursor = readableDatabase.rawQuery(sql, null);
+        cursor.moveToFirst();
+        int i = cursor.getInt(0);
+        return i;
+    }
 }
