@@ -28,6 +28,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class CreateMarker extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -65,7 +66,9 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
             public void onClick(View v) {
                 if(lat != 0.0 && lng != 0.0) {
                     DataBaseHelper dataBaseHelper = new DataBaseHelper(CreateMarker.this);
-                    dataBaseHelper.addPit(lat, lng, ratingPit);
+                    Random random = new Random();
+                    int i = random.nextInt(1000000) + 200000;
+                    dataBaseHelper.addPit(i, lat, lng, null, null, null);
                     Intent intent = new Intent(CreateMarker.this, MainActivity.class);
                     startActivity(intent);
                 }else{

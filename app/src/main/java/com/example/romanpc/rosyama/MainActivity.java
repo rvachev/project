@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -22,14 +23,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -54,8 +52,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<Geofence> mGeofenceList;
     private PendingIntent mGeofencePendingIntent;
     private static TextToSpeech tts;
-    private RatingBar ratingBar;
-    private float rating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,13 +64,29 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+
+        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.navigation_home:
+                        Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                        startActivity(intent);
+                        break;
+                    case R.id.navigation_dashboard:
+                        break;
+                    case R.id.navigation_notifications:
+                        Intent intent1 = new Intent(MainActivity.this, Info.class);
+                        startActivity(intent1);
+                        break;
+                }
+                return false;
+            }
+        });
+
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -103,18 +115,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onBackPressed() {
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                Intent intent = new Intent(MainActivity.this, ProfAftRegActivity.class);
-                startActivity(intent);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        ratingBar = (RatingBar)findViewById(R.id.ratingBar2);
         LinearLayout llBottomSheet = (LinearLayout) findViewById(R.id.bottom_sheet);
         final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -157,50 +156,49 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mGeofenceList = new ArrayList<>();
 
-        GeofencingClient client = LocationServices.getGeofencingClient(this);
-
-        GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
-        geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
+//        GeofencingClient client = LocationServices.getGeofencingClient(this);
+//
+//        GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
+//        geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
 
         final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
         ArrayList<HashMap<String, String>> listPits = dataBaseHelper.getPits();
         int i = 0;
         while (i < listPits.size()) {
-            double lat = Double.parseDouble(listPits.get(i).get("Lat"));
-            double lng = Double.parseDouble(listPits.get(i).get("Lng"));
-            rating = Float.parseFloat(listPits.get(i).get("rat"));
-            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
-            marker.setTag(listPits.get(i).get("_id"));
-            Geofence.Builder geofenceBuilder = new Geofence.Builder();
-            geofenceBuilder.setCircularRegion(lat, lng, 100);
-            geofenceBuilder.setRequestId(listPits.get(i).get("_id"));
-            geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
-            geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
-            Geofence geofence = geofenceBuilder.build();
-            mGeofenceList.add(geofence);
+            if(listPits.get(i).get("stat").equals("Отремонтировано") || listPits.get(i).get("stat").equals("Нет ответа")){
+
+            }else {
+                double lat = Double.parseDouble(listPits.get(i).get("Lat"));
+                double lng = Double.parseDouble(listPits.get(i).get("Lng"));
+                Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
+                marker.setTag(listPits.get(i).get("_id"));
+            }
+//            Geofence.Builder geofenceBuilder = new Geofence.Builder();
+//            geofenceBuilder.setCircularRegion(lat, lng, 100);
+//            geofenceBuilder.setRequestId(listPits.get(i).get("_id"));
+//            geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+//            geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
+//            Geofence geofence = geofenceBuilder.build();
+//            mGeofenceList.add(geofence);
             i++;
         }
-        GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofences(mGeofenceList);
-        GeofencingRequest geofencingRequest = addGeofence.build();
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        client.addGeofences(geofencingRequest, getGeofencePendingIntent())
-                .addOnCompleteListener(this);
+//        GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofences(mGeofenceList);
+//        GeofencingRequest geofencingRequest = addGeofence.build();
+//
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//            return;
+//        }
+//        client.addGeofences(geofencingRequest, getGeofencePendingIntent())
+//                .addOnCompleteListener(this);
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                TextView lat = (TextView)findViewById(R.id.textView21);
-                TextView lng = (TextView)findViewById(R.id.textView22);
+                TextView adr = (TextView)findViewById(R.id.textView16);
                 String pitId = (String)marker.getTag();
                 DataBaseHelper dataBaseHelper1 = new DataBaseHelper(MainActivity.this);
                 HashMap<String, String> pitInfo = dataBaseHelper1.getPitsById(pitId);
-                lat.setText(pitInfo.get("lat"));
-                lng.setText(pitInfo.get("lng"));
-                rating = Float.parseFloat(pitInfo.get("rat"));
-                ratingBar.setRating(rating);
+                adr.setText(pitInfo.get("adr"));
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 return false;
             }

@@ -58,7 +58,7 @@
         completions."
     </string>
     <string name="title_activity_main2">Main2Activity</string>
-    <string name="title_home">Профиль</string>
+    <string name="title_home">Настройки</string>
     <string name="title_dashboard">Карта</string>
     <string name="title_notifications">Информация</string>
 </resources>

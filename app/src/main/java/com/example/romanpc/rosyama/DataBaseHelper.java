@@ -16,8 +16,6 @@ import java.util.Scanner;
 public class DataBaseHelper extends SQLiteOpenHelper{
 
     private Context context;
-    static String DB_PATH = "/data/data/com.example.romanpc.rosyama/databases/";
-    static String DB_NAME = "database.db";
 
     public DataBaseHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
@@ -31,35 +29,16 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     //Выполняется при создании базы данных, нужно написать код для создания таблиц
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        copyDataBase();
-
         String sqlQuery1 = "CREATE TABLE pits (\n" +
-                "    _id       INTEGER PRIMARY KEY AUTOINCREMENT\n" +
+                "    _id       INTEGER PRIMARY KEY\n" +
                 "                      NOT NULL,\n" +
                 "    latitude  REAL,\n" +
                 "    longitude REAL,\n" +
-                "    city_id   INTEGER,\n" +
-                "    rating   REAL,\n" +
-                "    exist INTEGER\n" +
-                ")";
-        sqLiteDatabase.execSQL(sqlQuery1); //Этот метод позволяет выполнить любой SQL-запрос
-
-        String addPit = "INSERT INTO pits (latitude, longitude) VALUES (55.567332, 73.126748)";
-        sqLiteDatabase.execSQL(addPit);
-
-        String sqlQuery2 = "CREATE TABLE cities (\n" +
-                "    _id  INTEGER PRIMARY KEY AUTOINCREMENT\n" +
-                "                 NOT NULL,\n" +
-                "    city TEXT\n" +
-                ")";
-        sqLiteDatabase.execSQL(sqlQuery2);
-
-        String sqlQuery3 = "CREATE TABLE photos (\n" +
-                "    _id   INTEGER PRIMARY KEY AUTOINCREMENT\n" +
-                "                  NOT NULL,\n" +
+                "    address   TEXT,\n" +
+                "    status TEXT,\n" +
                 "    photo TEXT\n" +
                 ")";
-        sqLiteDatabase.execSQL(sqlQuery3);
+        sqLiteDatabase.execSQL(sqlQuery1); //Этот метод позволяет выполнить любой SQL-запрос
 
         String sqlQuery4 = "CREATE TABLE user (\n" +
                 "    _id   INTEGER PRIMARY KEY AUTOINCREMENT\n" +
@@ -88,10 +67,10 @@ public class DataBaseHelper extends SQLiteOpenHelper{
 
     }
 
-    public void addPit(double lat, double lng, double rating){
+    public void addPit(int id, double lat, double lng, String address, String status, String photo){
         //Объект, позволяющий записывать БД
         SQLiteDatabase writableDatabase = this.getWritableDatabase();
-        String sql = "INSERT INTO pits (latitude, longitude, rating) VALUES ("+lat+", "+lng+", "+rating+")";
+        String sql = "INSERT INTO pits (_id, latitude, longitude, address, status, photo) VALUES ("+id+", "+lat+", "+lng+", '"+address+"', '"+status+"', '"+photo+"')";
         writableDatabase.execSQL(sql);
     }
 
@@ -109,20 +88,19 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     public ArrayList<HashMap<String,String>> getPits(){
         //получение объекта, с помощью которого вы можете выполнять запросы к БД
         SQLiteDatabase readableDatabase = this.getReadableDatabase();
-        String sql = "SELECT _id, latitude, longitude FROM pits";
+        String sql = "SELECT _id, latitude, longitude, status FROM pits";
         Cursor cursor = readableDatabase.rawQuery(sql, null);
         ArrayList<HashMap<String,String>> pitsList = new ArrayList<>();
         while(cursor.moveToNext()) {
             int id = cursor.getInt(0);
             double latitude = cursor.getDouble(1);
             double longitude = cursor.getDouble(2);
-            float rating = cursor.getFloat(3);
+            String status = cursor.getString(3);
             HashMap<String, String> pit = new HashMap<>();
             pit.put("_id", Integer.toString(id));
             pit.put("Lat", Double.toString(latitude));
             pit.put("Lng", Double.toString(longitude));
-            pit.put("rat", Double.toString(rating));
-
+            pit.put("stat", status);
             pitsList.add(pit);
         }
 
@@ -131,36 +109,18 @@ public class DataBaseHelper extends SQLiteOpenHelper{
 
     public HashMap<String, String> getPitsById(String id){
         SQLiteDatabase readableDatabase = this.getReadableDatabase();
-        String sql = "SELECT latitude, longitude, rating FROM pits WHERE _id = ?";
+        String sql = "SELECT latitude, longitude, address, status FROM pits WHERE _id = ?";
         Cursor cursor = readableDatabase.rawQuery(sql, new String[]{id});
         HashMap<String, String> hashMap = new HashMap<>();
         while(cursor.moveToNext()) {
             double lat = cursor.getDouble(0);
             double lng = cursor.getDouble(1);
-            float rating = cursor.getFloat(2);
+            String address = cursor.getString(2);
+            String status = cursor.getString(3);
             hashMap.put("lat", Double.toString(lat));
             hashMap.put("lng", Double.toString(lng));
-            hashMap.put("rat", Float.toString(rating));
-        }
-        return hashMap;
-    }
-
-    public void writeUserInfo(String username, String photo){
-        SQLiteDatabase writableDatabase = this.getWritableDatabase();
-        String sql = "INSERT INTO user (name, photo) VALUES (?, ?)";
-        writableDatabase.execSQL(sql, new String[]{username, photo});
-    }
-
-    public HashMap<String, String> readUserInfo(){
-        SQLiteDatabase readableDatabase = this.getReadableDatabase();
-        String sql = "SELECT name, photo FROM user";
-        Cursor cursor = readableDatabase.rawQuery(sql, null);
-        HashMap<String, String> hashMap = new HashMap<>();
-        while (cursor.moveToNext()){
-            String name = cursor.getString(0);
-            String photo = cursor.getString(1);
-            hashMap.put("name", name);
-            hashMap.put("photo", photo);
+            hashMap.put("adr", address);
+            hashMap.put("stat", status);
         }
         return hashMap;
     }
@@ -177,26 +137,9 @@ public class DataBaseHelper extends SQLiteOpenHelper{
         return list;
     }
 
-    public void copyDataBase() {
-        try{
-            String outFileName = DB_PATH + DB_NAME;
-
-            OutputStream myOutput = new FileOutputStream(outFileName);
-
-            byte[] buffer = new byte[1024];
-            int length;
-
-            InputStream myInput = context.getAssets().open("database.s3db");
-            while ((length = myInput.read(buffer)) > 0) {
-                myOutput.write(buffer, 0, length);
-            }
-            myInput.close();
-
-            myOutput.flush();
-            myOutput.close();
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
+    public void cleanTable(){
+        SQLiteDatabase writableDatabase = this.getWritableDatabase();
+        String sql = "DELETE FROM pits";
+        writableDatabase.execSQL(sql);
     }
 }

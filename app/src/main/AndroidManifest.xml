@@ -52,11 +52,6 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
-        <activity android:name=".ProfAftRegActivity">
-        </activity>
-        <activity
-            android:name=".Profile"
-            android:label="Профиль" />
         <activity
             android:name=".Info"
             android:label="Информация" />
@@ -72,7 +67,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AuthActivity"></activity>
+        <activity android:name=".AuthActivity" />
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>

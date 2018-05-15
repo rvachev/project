@@ -1,8 +1,8 @@
 package com.example.romanpc.rosyama;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -20,7 +20,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SplashActivity extends AppCompatActivity {
+public class SettingsActivity extends AppCompatActivity {
 
     private Spinner spinner;
     private Button button;
@@ -29,12 +29,12 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+        setContentView(R.layout.activity_settings);
 
-        DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
+        spinner = (Spinner)findViewById(R.id.spinner2);
+        final DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
         ArrayList<String> list = dataBaseHelper.getCities();
 
-        spinner = (Spinner)findViewById(R.id.spinner);
         final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
@@ -51,7 +51,7 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
-        button = (Button)findViewById(R.id.button2);
+        button = (Button)findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,7 +61,8 @@ public class SplashActivity extends AppCompatActivity {
                         ResponseBody responseBody = response.body();
                         InputStream inputStream = responseBody.byteStream();
                         Scanner scanner = new Scanner(inputStream);
-                        DataBaseHelper dataBaseHelper1 = new DataBaseHelper(SplashActivity.this);
+                        DataBaseHelper dataBaseHelper1 = new DataBaseHelper(SettingsActivity.this);
+                        dataBaseHelper1.cleanTable();
                         while (scanner.hasNextLine()){
                             String row = scanner.nextLine();
                             String[] split = row.split(";");
@@ -72,7 +73,11 @@ public class SplashActivity extends AppCompatActivity {
                                     photo = split[6];
                                 }
                             }
-                            dataBaseHelper1.addPit(Integer.parseInt(split[0]), Double.parseDouble(split[3]), Double.parseDouble(split[4]), split[2], status, photo);
+                            try {
+                                dataBaseHelper1.addPit(Integer.parseInt(split[0]), Double.parseDouble(split[3]), Double.parseDouble(split[4]), split[2], status, photo);
+                            }catch(Exception e){
+                                e.printStackTrace();
+                            }
                             //System.out.println(row);
                         }
                     }
@@ -82,7 +87,6 @@ public class SplashActivity extends AppCompatActivity {
 
                     }
                 });
-                        startActivity(new Intent(SplashActivity.this, MainActivity.class));
             }
         });
     }

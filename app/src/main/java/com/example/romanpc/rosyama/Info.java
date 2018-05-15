@@ -23,7 +23,7 @@ public class Info extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.navigation_home:
-                        Intent intent = new Intent(Info.this, Profile.class);
+                        Intent intent = new Intent(Info.this, SettingsActivity.class);
                         startActivity(intent);
                         break;
                     case R.id.navigation_dashboard:
