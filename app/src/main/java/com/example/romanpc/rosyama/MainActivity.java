@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -28,6 +30,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,14 +39,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterItem;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, OnCompleteListener<Void> {
 
@@ -52,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<Geofence> mGeofenceList;
     private PendingIntent mGeofencePendingIntent;
     private static TextToSpeech tts;
+    private ClusterManager<ClusterItemImpl> mClusterManager;
+    private BottomSheetBehavior bottomSheetBehavior;
+    private TextView address;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +84,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        address = (TextView)findViewById(R.id.textView16);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -128,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LinearLayout llBottomSheet = (LinearLayout) findViewById(R.id.bottom_sheet);
-        final BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
+        bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -152,10 +167,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mGeofenceList = new ArrayList<>();
 
-//        GeofencingClient client = LocationServices.getGeofencingClient(this);
-//
-//        GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
-//        geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
+        GeofencingClient client = LocationServices.getGeofencingClient(this);
+
+        GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
+        geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
 
         final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
         ArrayList<HashMap<String, String>> listPits = dataBaseHelper.getPits();
@@ -168,41 +183,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 double lng = Double.parseDouble(listPits.get(i).get("Lng"));
                 Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
                 marker.setTag(listPits.get(i).get("_id"));
+            Geofence.Builder geofenceBuilder = new Geofence.Builder();
+            geofenceBuilder.setCircularRegion(lat, lng, 100);
+            geofenceBuilder.setRequestId(listPits.get(i).get("_id"));
+            geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+            geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
+            Geofence geofence = geofenceBuilder.build();
+            mGeofenceList.add(geofence);
             }
-//            Geofence.Builder geofenceBuilder = new Geofence.Builder();
-//            geofenceBuilder.setCircularRegion(lat, lng, 100);
-//            geofenceBuilder.setRequestId(listPits.get(i).get("_id"));
-//            geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
-//            geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
-//            Geofence geofence = geofenceBuilder.build();
-//            mGeofenceList.add(geofence);
             i++;
         }
-//        GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofences(mGeofenceList);
-//        GeofencingRequest geofencingRequest = addGeofence.build();
-//
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            return;
-//        }
-//        client.addGeofences(geofencingRequest, getGeofencePendingIntent())
-//                .addOnCompleteListener(this);
+        GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofences(mGeofenceList);
+        GeofencingRequest geofencingRequest = addGeofence.build();
 
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                TextView adr = (TextView)findViewById(R.id.textView16);
-                String pitId = (String)marker.getTag();
-                DataBaseHelper dataBaseHelper1 = new DataBaseHelper(MainActivity.this);
-                HashMap<String, String> pitInfo = dataBaseHelper1.getPitsById(pitId);
-                adr.setText(pitInfo.get("adr"));
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-                return false;
-            }
-        });
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        client.addGeofences(geofencingRequest, getGeofencePendingIntent())
+                .addOnCompleteListener(this);
 
 
         createLocationRequest();
 
+        ArrayList<ClusterItemImpl> companies = dataBaseHelper.getCompaniesForClaster();
+        setMarkersOnMap(companies);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -216,6 +220,74 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
                     }
                 });
+
+        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager != null) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+
+                }
+            });
+        }
+    }
+
+    public void setMarkersOnMap(final ArrayList<ClusterItemImpl> items){
+        mClusterManager = new ClusterManager<>(MainActivity.this, mMap);
+        mMap.setOnCameraIdleListener(mClusterManager);
+        mClusterManager.addItems(items);
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItemImpl>() {
+            @Override
+            public boolean onClusterClick(Cluster<ClusterItemImpl> cluster) {
+                LatLngBounds.Builder builder = LatLngBounds.builder();
+                for (ClusterItem item : cluster.getItems()) {
+                    builder.include(item.getPosition());
+                }
+                // Get the LatLngBounds
+                final LatLngBounds bounds = builder.build();
+
+                // Animate camera to the bounds
+                try {
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return true;
+            }
+        });
+        mMap.setOnMarkerClickListener(mClusterManager);
+
+        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterItemImpl>() {
+            @Override
+            public boolean onClusterItemClick(ClusterItemImpl clusterItem) {
+
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
+                DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
+                String pitId = clusterItem.getPitId();
+                HashMap<String, String> pitsById = dataBaseHelper.getPitsById(pitId);
+                String adr = pitsById.get("adr");
+                address.setText(adr);
+                return false;
+            }
+        });
     }
 
     private PendingIntent getGeofencePendingIntent() {
@@ -240,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (task.isSuccessful()) {
             //Toast.makeText(this, "Успешно добавлено", Toast.LENGTH_SHORT).show();
         }else {
-            Toast.makeText(this, "Возникла проблема", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Возникла проблема", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -251,4 +323,5 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
         }
     }
+
 }

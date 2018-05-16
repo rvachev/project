@@ -25,10 +25,12 @@ public class Info extends AppCompatActivity {
                     case R.id.navigation_home:
                         Intent intent = new Intent(Info.this, SettingsActivity.class);
                         startActivity(intent);
+                        finish();
                         break;
                     case R.id.navigation_dashboard:
                         Intent intent1 = new Intent(Info.this, MainActivity.class);
                         startActivity(intent1);
+                        finish();
                         break;
                     case R.id.navigation_notifications:
                         break;

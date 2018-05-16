@@ -151,4 +151,18 @@ public class DataBaseHelper extends SQLiteOpenHelper{
         int i = cursor.getInt(0);
         return i;
     }
+
+    public ArrayList<ClusterItemImpl> getCompaniesForClaster(){
+        ArrayList<ClusterItemImpl> items = new ArrayList<>();
+        SQLiteDatabase readableDatabase = this.getReadableDatabase();
+        String sql = "SELECT _id, latitude, longitude FROM pits";
+        Cursor cursor = readableDatabase.rawQuery(sql, null);
+        while (cursor.moveToNext()){
+            int id = cursor.getInt(0);
+            double lat = cursor.getDouble(1);
+            double lng = cursor.getDouble(2);
+            items.add(new ClusterItemImpl(String.valueOf(id), lat, lng));
+        }
+        return items;
+    }
 }

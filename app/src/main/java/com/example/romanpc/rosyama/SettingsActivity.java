@@ -44,10 +44,12 @@ public class SettingsActivity extends AppCompatActivity {
                     case R.id.navigation_dashboard:
                         Intent intent1 = new Intent(SettingsActivity.this, MainActivity.class);
                         startActivity(intent1);
+                        finish();
                         break;
                     case R.id.navigation_notifications:
                         Intent intent = new Intent(SettingsActivity.this, Info.class);
                         startActivity(intent);
+                        finish();
                         break;
                 }
                 return false;
