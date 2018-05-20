@@ -105,6 +105,7 @@ public class SettingsActivity extends AppCompatActivity {
                             }
                             //System.out.println(row);
                         }
+                        button.setEnabled(false);
                     }
 
                     @Override
