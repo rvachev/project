@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">RosYama</string>
+    <string name="app_name">Детектор ям</string>
     <string name="title_activity_maps">Map</string>
     <string name="e_mail">E-mail:</string>
     <string name="e_mail_edt">E-mail</string>

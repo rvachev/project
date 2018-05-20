@@ -24,9 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.LinearLayout;
-import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
@@ -50,9 +48,7 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, OnCompleteListener<Void> {
 
@@ -65,6 +61,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ClusterManager<ClusterItemImpl> mClusterManager;
     private BottomSheetBehavior bottomSheetBehavior;
     private TextView address;
+    private static Location mLocation;
+    private float distance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
 
-        address = (TextView)findViewById(R.id.textView16);
+        address = (TextView) findViewById(R.id.textView16);
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -167,44 +165,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mGeofenceList = new ArrayList<>();
 
-        GeofencingClient client = LocationServices.getGeofencingClient(this);
+        final GeofencingClient client = LocationServices.getGeofencingClient(this);
 
-        GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
+        final GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
         geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
-
-        final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
-        ArrayList<HashMap<String, String>> listPits = dataBaseHelper.getPits();
-        int i = 0;
-        while (i < listPits.size()) {
-            if(listPits.get(i).get("stat").equals("Отремонтировано") || listPits.get(i).get("stat").equals("Нет ответа")){
-
-            }else {
-                double lat = Double.parseDouble(listPits.get(i).get("Lat"));
-                double lng = Double.parseDouble(listPits.get(i).get("Lng"));
-                Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
-                marker.setTag(listPits.get(i).get("_id"));
-            Geofence.Builder geofenceBuilder = new Geofence.Builder();
-            geofenceBuilder.setCircularRegion(lat, lng, 100);
-            geofenceBuilder.setRequestId(listPits.get(i).get("_id"));
-            geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
-            geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
-            Geofence geofence = geofenceBuilder.build();
-            mGeofenceList.add(geofence);
-            }
-            i++;
-        }
-        GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofences(mGeofenceList);
-        GeofencingRequest geofencingRequest = addGeofence.build();
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        client.addGeofences(geofencingRequest, getGeofencePendingIntent())
-                .addOnCompleteListener(this);
-
 
         createLocationRequest();
 
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
         ArrayList<ClusterItemImpl> companies = dataBaseHelper.getCompaniesForClaster();
         setMarkersOnMap(companies);
 
@@ -218,15 +186,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onSuccess(Location location) {
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                        mLocation = location;
+                        addGeofence(client, geofencingRequestBuilder);
                     }
                 });
 
-        LocationManager locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (locationManager != null) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
-
+                    mLocation = location;
+                    client.removeGeofences(getGeofencePendingIntent());
+                    addGeofence(client, geofencingRequestBuilder);
                 }
 
                 @Override
@@ -247,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
-    public void setMarkersOnMap(final ArrayList<ClusterItemImpl> items){
+    public void setMarkersOnMap(final ArrayList<ClusterItemImpl> items) {
         mClusterManager = new ClusterManager<>(MainActivity.this, mMap);
         mMap.setOnCameraIdleListener(mClusterManager);
         mClusterManager.addItems(items);
@@ -311,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onComplete(@NonNull Task<Void> task) {
         if (task.isSuccessful()) {
             //Toast.makeText(this, "Успешно добавлено", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
 //            Toast.makeText(this, "Возникла проблема", Toast.LENGTH_SHORT).show();
         }
     }
@@ -321,6 +293,50 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void onReceive(Context context, Intent intent) {
             tts.speak("Внимание! Впереди яма!", TextToSpeech.QUEUE_FLUSH, null);
             //Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void addGeofence(GeofencingClient client, GeofencingRequest.Builder geofencingRequestBuilder) {
+        final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
+        ArrayList<HashMap<String, String>> listPits = dataBaseHelper.getPits();
+        if (mLocation != null) {
+            int i = 0;
+            while (i < listPits.size()) {
+                if (listPits.get(i).get("stat").equals("Отремонтировано") || listPits.get(i).get("stat").equals("Нет ответа")) {
+
+                } else {
+                    if (mLocation != null) {
+                        Location newLocation = new Location("newlocation");
+                        newLocation.setLatitude(Double.parseDouble(listPits.get(i).get("Lat")));
+                        newLocation.setLongitude(Double.parseDouble(listPits.get(i).get("Lng")));
+                        distance = mLocation.distanceTo(newLocation);
+                        if (distance < 500 && mGeofenceList.size() < 100) {
+                            double lat = Double.parseDouble(listPits.get(i).get("Lat"));
+                            double lng = Double.parseDouble(listPits.get(i).get("Lng"));
+                            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
+                            marker.setTag(listPits.get(i).get("_id"));
+                            Geofence.Builder geofenceBuilder = new Geofence.Builder();
+                            geofenceBuilder.setCircularRegion(lat, lng, 100);
+                            geofenceBuilder.setRequestId(listPits.get(i).get("_id"));
+                            geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
+                            geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
+                            Geofence geofence = geofenceBuilder.build();
+                            mGeofenceList.add(geofence);
+                        }
+                    }
+                }
+                i++;
+            }
+        }
+        if (mGeofenceList.size() > 0) {
+            GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofences(mGeofenceList);
+            GeofencingRequest geofencingRequest = addGeofence.build();
+
+
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            }
+            client.addGeofences(geofencingRequest, getGeofencePendingIntent())
+                    .addOnCompleteListener(this);
         }
     }
 

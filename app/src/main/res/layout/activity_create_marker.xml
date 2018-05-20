@@ -17,24 +17,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="28dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="16dp"
-        android:text="Уровень опасности"
-        android:textColor="@android:color/black"
-        android:textSize="18sp"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <RatingBar
-        android:id="@+id/ratebar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:numStars="3"
-        android:stepSize="1" />
-
-    <TextView
         android:id="@+id/textView19"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

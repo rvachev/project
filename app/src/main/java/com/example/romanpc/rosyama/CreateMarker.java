@@ -11,8 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RatingBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -26,8 +24,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 public class CreateMarker extends AppCompatActivity implements OnMapReadyCallback {
@@ -35,8 +31,6 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private double lat, lng;
     private int hasMarker = 0;
-    private RatingBar ratingBar;
-    private float ratingPit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +41,6 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        ratingBar = (RatingBar)findViewById(R.id.ratebar);
-        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                ratingPit = rating;
-            }
-        });
 
         MapView mapView = (MapView) findViewById(R.id.mapView);
         mapView.getMapAsync(this);
