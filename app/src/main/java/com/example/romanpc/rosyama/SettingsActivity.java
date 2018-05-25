@@ -1,6 +1,9 @@
 package com.example.romanpc.rosyama;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.location.Geocoder;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
@@ -68,6 +71,11 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 region = parent.getItemAtPosition(position).toString();
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+                sharedPreferencesEditor.remove("region");
+                sharedPreferencesEditor.putString("region", region);
+                sharedPreferencesEditor.commit();
             }
 
             @Override

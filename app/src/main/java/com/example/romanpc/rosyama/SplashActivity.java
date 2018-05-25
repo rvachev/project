@@ -31,14 +31,14 @@ public class SplashActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
-
         DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
         int i = dataBaseHelper.dataExist();
         if(i > 0){
             startActivity(new Intent(this, MainActivity.class));
         }
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_splash);
+
         ArrayList<String> list = dataBaseHelper.getCities();
 
         spinner = (Spinner)findViewById(R.id.spinner);
@@ -87,6 +87,7 @@ public class SplashActivity extends AppCompatActivity {
                             }
                             dataBaseHelper1.addPit(Integer.parseInt(split[0]), Double.parseDouble(split[3]), Double.parseDouble(split[4]), split[2], status, photo);
                             continuebtn.setEnabled(true);
+                            button.setEnabled(false);
                         }
                     }
 
