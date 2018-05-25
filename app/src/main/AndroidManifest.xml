@@ -43,18 +43,22 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
+            android:label="@string/title_activity_maps"
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".Info"
-            android:label="Информация" />
+            android:label="Информация"
+            android:screenOrientation="portrait"/>
         <activity android:name=".CreateMarker" />
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity android:name=".SplashActivity"
-                  android:label="Выбор региона">
+                  android:label="Выбор региона"
+                  android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -62,7 +66,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".SettingsActivity"
-                  android:label="Настройки"/>
+                  android:label="Настройки"
+                  android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
