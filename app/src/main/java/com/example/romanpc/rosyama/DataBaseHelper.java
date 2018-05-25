@@ -109,7 +109,7 @@ public class DataBaseHelper extends SQLiteOpenHelper{
 
     public HashMap<String, String> getPitsById(String id){
         SQLiteDatabase readableDatabase = this.getReadableDatabase();
-        String sql = "SELECT latitude, longitude, address, status FROM pits WHERE _id = ?";
+        String sql = "SELECT latitude, longitude, address, status, photo FROM pits WHERE _id = ?";
         Cursor cursor = readableDatabase.rawQuery(sql, new String[]{id});
         HashMap<String, String> hashMap = new HashMap<>();
         while(cursor.moveToNext()) {
@@ -117,10 +117,12 @@ public class DataBaseHelper extends SQLiteOpenHelper{
             double lng = cursor.getDouble(1);
             String address = cursor.getString(2);
             String status = cursor.getString(3);
+            String photo = cursor.getString(4);
             hashMap.put("lat", Double.toString(lat));
             hashMap.put("lng", Double.toString(lng));
             hashMap.put("adr", address);
             hashMap.put("stat", status);
+            hashMap.put("photo", photo);
         }
         return hashMap;
     }

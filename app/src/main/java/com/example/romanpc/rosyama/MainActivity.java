@@ -23,6 +23,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -46,6 +48,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView address;
     private static Location mLocation;
     private float distance;
+    private ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+        imageView = (ImageView)findViewById(R.id.imageView);
 
 
         mMap = googleMap;
@@ -230,10 +235,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 for (ClusterItem item : cluster.getItems()) {
                     builder.include(item.getPosition());
                 }
-                // Get the LatLngBounds
                 final LatLngBounds bounds = builder.build();
-
-                // Animate camera to the bounds
                 try {
                     mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
                 } catch (Exception e) {
@@ -256,10 +258,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 String pitId = clusterItem.getPitId();
                 HashMap<String, String> pitsById = dataBaseHelper.getPitsById(pitId);
                 String adr = pitsById.get("adr");
+                try {
+                    String photo = pitsById.get("photo");
+                    String photoRepl = photo.replace("|", ";");
+                    String[] split = photoRepl.split(";");
+                    Picasso.with(MainActivity.this).load(split[0]).into(imageView);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
                 address.setText(adr);
                 return false;
             }
         });
+
     }
 
     private PendingIntent getGeofencePendingIntent() {
