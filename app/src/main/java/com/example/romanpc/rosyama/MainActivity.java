@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static Location mLocation;
     private float distance;
     private ImageView imageView;
+    private static ArrayList<Geofence> allPits;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mMap = googleMap;
 
-
+        allPits = new ArrayList<>();
         mGeofenceList = new ArrayList<>();
 
         final GeofencingClient client = LocationServices.getGeofencingClient(this);
@@ -202,6 +203,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 @Override
                 public void onLocationChanged(Location location) {
                     mLocation = location;
+                    for(int i = 0; i < mGeofenceList.size(); i++){
+                        allPits.add(mGeofenceList.get(i));
+                    }
                     client.removeGeofences(getGeofencePendingIntent());
                     addGeofence(client, geofencingRequestBuilder);
                 }
@@ -308,6 +312,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     public void addGeofence(GeofencingClient client, GeofencingRequest.Builder geofencingRequestBuilder) {
+        mGeofenceList.clear();
         final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
         ArrayList<HashMap<String, String>> listPits = dataBaseHelper.getPits();
         if (mLocation != null) {
@@ -332,7 +337,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             geofenceBuilder.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER);
                             geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
                             Geofence geofence = geofenceBuilder.build();
-                            mGeofenceList.add(geofence);
+                            int x = 0;
+                            for(int j = 0; j < allPits.size(); j++){
+                                if(geofence.equals(allPits.get(j))){
+                                    x++;
+                                }
+                            }
+                            if(x == 0) {
+                                mGeofenceList.add(geofence);
+                            }
                         }
                     }
                 }

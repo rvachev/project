@@ -1,7 +1,9 @@
 package com.example.romanpc.rosyama;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -48,6 +50,10 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 region = parent.getItemAtPosition(position).toString();
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+                sharedPreferencesEditor.putString("region", region);
+                sharedPreferencesEditor.commit();
             }
 
             @Override
