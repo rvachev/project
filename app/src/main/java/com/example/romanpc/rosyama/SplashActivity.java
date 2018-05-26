@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -68,6 +70,8 @@ public class SplashActivity extends AppCompatActivity {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    final ProgressBar progressBar = (ProgressBar)findViewById(R.id.progressBar);
+                    progressBar.setVisibility(ProgressBar.VISIBLE);
                     ApiService.getApi("http://kredit55.ru/").getPitsByRegionName(region).enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -87,6 +91,7 @@ public class SplashActivity extends AppCompatActivity {
                                 }
                                 dataBaseHelper1.addPit(Integer.parseInt(split[0]), Double.parseDouble(split[3]), Double.parseDouble(split[4]), split[2], status, photo);
                             }
+                            progressBar.setVisibility(ProgressBar.INVISIBLE);
                             startActivity(new Intent(SplashActivity.this, MainActivity.class));
                         }
 
