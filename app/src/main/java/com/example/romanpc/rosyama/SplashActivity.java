@@ -26,83 +26,76 @@ import retrofit2.Response;
 public class SplashActivity extends AppCompatActivity {
 
     private Spinner spinner;
-    private Button button, continuebtn;
+    private Button button;
     private String region;
+    private int i;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
-        int i = dataBaseHelper.dataExist();
-        if(i > 0){
+        i = dataBaseHelper.dataExist();
+        if(i > 0) {
             startActivity(new Intent(this, MainActivity.class));
         }
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_splash);
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_splash);
+            ArrayList<String> list = dataBaseHelper.getCities();
 
-        ArrayList<String> list = dataBaseHelper.getCities();
+            spinner = (Spinner) findViewById(R.id.spinner);
+            final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinner.setAdapter(adapter);
 
-        spinner = (Spinner)findViewById(R.id.spinner);
-        final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
+            spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    region = parent.getItemAtPosition(position).toString();
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                    if(i < 1) {
+                        SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
+                        sharedPreferencesEditor.putString("region", SplashActivity.this.region);
+                        sharedPreferencesEditor.commit();
+                    }
+                }
 
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                region = parent.getItemAtPosition(position).toString();
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-                SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
-                sharedPreferencesEditor.putString("region", region);
-                sharedPreferencesEditor.commit();
-            }
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+                }
+            });
 
-            }
-        });
-
-        continuebtn = (Button)findViewById(R.id.button3);
-        continuebtn.setEnabled(false);
-        button = (Button)findViewById(R.id.button2);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ApiService.getApi("http://kredit55.ru/").getPitsByRegionName(region).enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        ResponseBody responseBody = response.body();
-                        InputStream inputStream = responseBody.byteStream();
-                        Scanner scanner = new Scanner(inputStream);
-                        DataBaseHelper dataBaseHelper1 = new DataBaseHelper(SplashActivity.this);
-                        while (scanner.hasNextLine()){
-                            String row = scanner.nextLine();
-                            String[] split = row.split(";");
-                            String status = null, photo = null;
-                            if(split.length > 5){
-                                status = split[5];
-                                if(split.length > 6){
-                                    photo = split[6];
+            button = (Button) findViewById(R.id.button2);
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ApiService.getApi("http://kredit55.ru/").getPitsByRegionName(region).enqueue(new Callback<ResponseBody>() {
+                        @Override
+                        public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                            ResponseBody responseBody = response.body();
+                            InputStream inputStream = responseBody.byteStream();
+                            Scanner scanner = new Scanner(inputStream);
+                            DataBaseHelper dataBaseHelper1 = new DataBaseHelper(SplashActivity.this);
+                            while (scanner.hasNextLine()) {
+                                String row = scanner.nextLine();
+                                String[] split = row.split(";");
+                                String status = null, photo = null;
+                                if (split.length > 5) {
+                                    status = split[5];
+                                    if (split.length > 6) {
+                                        photo = split[6];
+                                    }
                                 }
+                                dataBaseHelper1.addPit(Integer.parseInt(split[0]), Double.parseDouble(split[3]), Double.parseDouble(split[4]), split[2], status, photo);
                             }
-                            dataBaseHelper1.addPit(Integer.parseInt(split[0]), Double.parseDouble(split[3]), Double.parseDouble(split[4]), split[2], status, photo);
-                            continuebtn.setEnabled(true);
-                            button.setEnabled(false);
+                            startActivity(new Intent(SplashActivity.this, MainActivity.class));
                         }
-                    }
 
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        @Override
+                        public void onFailure(Call<ResponseBody> call, Throwable t) {
 
-                    }
-                });
-            }
-        });
-        continuebtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-            }
-        });
+                        }
+                    });
+                }
+            });
     }
 }

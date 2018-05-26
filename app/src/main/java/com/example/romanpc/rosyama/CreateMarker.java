@@ -117,24 +117,14 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-//        final DataBaseHelper dataBaseHelper = new DataBaseHelper(CreateMarker.this);
-//        ArrayList<HashMap<String,String>> listPits = dataBaseHelper.getPits();
         int i = 0;
-
-//        while(i < listPits.size()){
-//            double lat = Double.parseDouble(listPits.get(i).get("Lat"));
-//            double lng = Double.parseDouble(listPits.get(i).get("Lng"));
-//            Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
-//            marker.setTag(listPits.get(i).get("_id"));
-//            i++;
-//        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mMap.setMyLocationEnabled(true);
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
-            public void onMapLongClick(LatLng latLng) {
+            public void onMapClick(LatLng latLng) {
                 if(hasMarker == 0){
                     Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
                     hasMarker++;
@@ -155,7 +145,6 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
             }
         });
         FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
