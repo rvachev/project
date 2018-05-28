@@ -27,6 +27,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.romanpc.api.ApiService;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -277,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 button_comp.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        Toast.makeText(MainActivity.this, "Ваш запрос отправлен", Toast.LENGTH_SHORT).show();
                         ApiService.getApi("http://kredit55.ru/").complitePit(pitId).enqueue(new Callback<ResponseBody>() {
                             @Override
                             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
