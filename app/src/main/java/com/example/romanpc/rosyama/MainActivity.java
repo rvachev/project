@@ -23,10 +23,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.romanpc.api.ApiService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -51,8 +53,15 @@ import com.google.maps.android.clustering.ClusterItem;
 import com.google.maps.android.clustering.ClusterManager;
 import com.squareup.picasso.Picasso;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Scanner;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, OnCompleteListener<Void> {
 
@@ -261,9 +270,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
                 DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
-                String pitId = clusterItem.getPitId();
+                final String pitId = clusterItem.getPitId();
                 HashMap<String, String> pitsById = dataBaseHelper.getPitsById(pitId);
                 String adr = pitsById.get("adr");
+                Button button_comp = (Button)findViewById(R.id.button_comp);
+                button_comp.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        ApiService.getApi("http://kredit55.ru/").complitePit(pitId).enqueue(new Callback<ResponseBody>() {
+                            @Override
+                            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                                ResponseBody responseBody = response.body();
+                                InputStream inputStream = responseBody.byteStream();
+                                Scanner scanner = new Scanner(inputStream);
+                            }
+
+                            @Override
+                            public void onFailure(Call<ResponseBody> call, Throwable t) {
+
+                            }
+                        });
+                    }
+                });
                 try {
                     String photo = pitsById.get("photo");
                     String photoRepl = photo.replace("|", ";");

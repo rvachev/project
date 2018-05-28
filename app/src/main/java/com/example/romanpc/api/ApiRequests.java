@@ -12,4 +12,7 @@ public interface ApiRequests {
 
     @GET("/save_pit.php")
     Call<ResponseBody> savePit(@Query("region") String regionName, @Query("latitude") String latitude, @Query("longitude") String longitude, @Query("address") String address);
+
+    @GET("/pit_complite.php")
+    Call<ResponseBody> complitePit(@Query("pit_id") String pit_id);
 }
