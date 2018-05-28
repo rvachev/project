@@ -23,7 +23,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,7 +31,9 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -68,6 +69,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private float distance;
     private ImageView imageView;
     private static ArrayList<Geofence> allPits;
+    private static LocationManager locationManager;
+    private static FusedLocationProviderClient mFusedLocationClient;
+    private static LocationCallback mLocationCallback;
+    private static LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(intent);
             }
         });
+
     }
 
     @Override
@@ -159,7 +165,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
-        imageView = (ImageView)findViewById(R.id.imageView);
+        imageView = (ImageView) findViewById(R.id.imageView);
 
 
         mMap = googleMap;
@@ -182,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
         mMap.setMyLocationEnabled(true);
-        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -193,13 +199,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
 
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (locationManager != null) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
                     mLocation = location;
-                    for(int i = 0; i < mGeofenceList.size(); i++){
+                    for (int i = 0; i < mGeofenceList.size(); i++) {
                         allPits.add(mGeofenceList.get(i));
                     }
                     client.removeGeofences(getGeofencePendingIntent());
@@ -263,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     String photoRepl = photo.replace("|", ";");
                     String[] split = photoRepl.split(";");
                     Picasso.with(MainActivity.this).load(split[0]).into(imageView);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 address.setText(adr);
@@ -283,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     protected void createLocationRequest() {
-        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1500);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -303,7 +309,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onReceive(Context context, Intent intent) {
             tts.speak("Внимание! Впереди яма!", TextToSpeech.QUEUE_FLUSH, null);
-            //Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -334,12 +340,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
                             Geofence geofence = geofenceBuilder.build();
                             int x = 0;
-                            for(int j = 0; j < allPits.size(); j++){
-                                if(geofence.equals(allPits.get(j))){
+                            for (int j = 0; j < allPits.size(); j++) {
+                                if (geofence.equals(allPits.get(j))) {
                                     x++;
                                 }
                             }
-                            if(x == 0) {
+                            if (x == 0) {
                                 mGeofenceList.add(geofence);
                             }
                         }
@@ -359,5 +365,4 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     .addOnCompleteListener(this);
         }
     }
-
 }

@@ -50,7 +50,6 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
     private int hasMarker = 0;
     private static String address;
     private static TextView adr;
-    private static EditText regionName;
     private static String region;
 
     @Override
@@ -68,10 +67,8 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
         adr = (TextView)findViewById(R.id.textView21);
-        regionName = (EditText)findViewById(R.id.editText8);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         region = sharedPreferences.getString("region", "");
-        regionName.setText(region);
 
         Button btn = (Button) findViewById(R.id.button7);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -81,7 +78,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
                     DataBaseHelper dataBaseHelper = new DataBaseHelper(CreateMarker.this);
                     Random random = new Random();
                     int i = random.nextInt(1000000) + 200000;
-                    dataBaseHelper.addPit(i, lat, lng, null, null, null);
+                    dataBaseHelper.addPit(i, lat, lng, address, null, null);
                     ApiService.getApi("http://kredit55.ru/").savePit(region, String.valueOf(lat), String.valueOf(lng), address).enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
