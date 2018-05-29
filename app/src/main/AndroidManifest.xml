@@ -40,13 +40,6 @@
             android:name=".MainActivity$GeofenceBroadcastReceiver"
             android:enabled="true"
             android:exported="true" />
-
-        <activity
-            android:name=".MapsActivity"
-            android:label="@string/title_activity_maps"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask">
-        </activity>
         <activity
             android:name=".Info"
             android:label="Информация"
@@ -59,7 +52,6 @@
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".SplashActivity"

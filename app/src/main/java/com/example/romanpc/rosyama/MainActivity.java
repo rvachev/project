@@ -144,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     if (this.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && this.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         Intent intent = new Intent(MainActivity.this, MainActivity.class);
                         startActivity(intent);
+                        finish();
                     }
                 }
         }
