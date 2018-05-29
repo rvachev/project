@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -34,9 +33,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -68,45 +65,45 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_FOR_GET_USER_LOCATION = 1;
-    FloatingActionButton fab;
+    private FloatingActionButton fab;
     private ArrayList<Geofence> mGeofenceList;
     private PendingIntent mGeofencePendingIntent;
     private static TextToSpeech tts;
-    private ClusterManager<ClusterItemImpl> mClusterManager;
     private BottomSheetBehavior bottomSheetBehavior;
     private TextView address;
     private static Location mLocation;
-    private float distance;
     private ImageView imageView;
     private static ArrayList<Geofence> allPits;
-    private static LocationManager locationManager;
-    private static FusedLocationProviderClient mFusedLocationClient;
-    private static LocationCallback mLocationCallback;
-    private static LocationRequest mLocationRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Создание объекта класса TextToSpeech
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
 
             }
         });
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //Экран не гаснет во время работы приложения
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        //Кнопка "Назад на ActionBar"
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
+        //Текстовое поле "Адрес" в BottomSheet
         address = (TextView) findViewById(R.id.textView16);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        //Создание фрагмента карты
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        mapFragment.onCreate(savedInstanceState);
+        mapFragment.onResume();
+        //Запрос на разрешение использования местоположения
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (this.checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && this.checkSelfPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 this.requestPermissions(
@@ -114,11 +111,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         PERMISSION_REQUEST_FOR_GET_USER_LOCATION);
             }
         }
-        mapFragment.getMapAsync(this);
-        mapFragment.onCreate(savedInstanceState);
-        mapFragment.onResume();
+        //Кнопка добавления ямы
         fab = (FloatingActionButton) findViewById(R.id.fab);
-
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
     }
-
+    //Обработка нажатия кнопки "Назад" в ActionBar
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -140,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 return super.onOptionsItemSelected(item);
         }
     }
-
+    //Разрешение на доступ к местоположению
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -154,9 +148,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
         }
     }
-
+    //Работа карты
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        //Определение BottomSheet
         LinearLayout llBottomSheet = (LinearLayout) findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(llBottomSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
@@ -175,30 +170,30 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+        //Потенциальная фотография ямы
         imageView = (ImageView) findViewById(R.id.imageView);
-
-
+        //Инициализация карты
         mMap = googleMap;
-
-        allPits = new ArrayList<>();
-        mGeofenceList = new ArrayList<>();
-
-        final GeofencingClient client = LocationServices.getGeofencingClient(this);
-
-        final GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
-        geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
-
-        createLocationRequest();
-
-        DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
-        ArrayList<ClusterItemImpl> companies = dataBaseHelper.getCompaniesForClaster();
-        setMarkersOnMap(companies);
-
+        //Кнопка местоположения
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         mMap.setMyLocationEnabled(true);
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //Запрос на получение текущего местоположения
+        createLocationRequest();
+        //Массивы для работы с geofence
+        allPits = new ArrayList<>();
+        mGeofenceList = new ArrayList<>();
+        //Начало работы geofence
+        final GeofencingClient client = LocationServices.getGeofencingClient(this);
+        final GeofencingRequest.Builder geofencingRequestBuilder = new GeofencingRequest.Builder();
+        geofencingRequestBuilder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER | GeofencingRequest.INITIAL_TRIGGER_DWELL);
+        //База данных и выгрузка ям
+        DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
+        ArrayList<ClusterItemImpl> companies = dataBaseHelper.getCompaniesForClaster();
+        setMarkersOnMap(companies);
+        //Получение последнего местоположения
+        FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
@@ -208,16 +203,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         addGeofence(client, geofencingRequestBuilder);
                     }
                 });
-
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        //Отслеживание изменения местоположения
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (locationManager != null) {
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
                     mLocation = location;
-                    for (int i = 0; i < mGeofenceList.size(); i++) {
-                        allPits.add(mGeofenceList.get(i));
-                    }
+                    allPits.addAll(mGeofenceList);
                     client.removeGeofences(getGeofencePendingIntent());
                     addGeofence(client, geofencingRequestBuilder);
                 }
@@ -240,10 +233,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //Кластеризация маркеров
     public void setMarkersOnMap(final ArrayList<ClusterItemImpl> items) {
-        mClusterManager = new ClusterManager<>(MainActivity.this, mMap);
+        //Определение ClusterManager и добавление кластеров
+        ClusterManager<ClusterItemImpl> mClusterManager = new ClusterManager<>(MainActivity.this, mMap);
         mMap.setOnCameraIdleListener(mClusterManager);
         mClusterManager.addItems(items);
+        //Обработка нажатия на кластеры
         mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterItemImpl>() {
             @Override
             public boolean onClusterClick(Cluster<ClusterItemImpl> cluster) {
@@ -262,19 +258,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
         mMap.setOnMarkerClickListener(mClusterManager);
-
+        //Обработка на нажатие элемента кластера
         mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterItemImpl>() {
             @Override
             public boolean onClusterItemClick(ClusterItemImpl clusterItem) {
-
                 if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_HIDDEN) {
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
                 }
+                //Получение информации о яме относительно ее id
                 DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
                 final String pitId = clusterItem.getPitId();
                 HashMap<String, String> pitsById = dataBaseHelper.getPitsById(pitId);
                 String adr = pitsById.get("adr");
                 Button button_comp = (Button)findViewById(R.id.button_comp);
+                //Отправка запрос на удаление ямы
                 button_comp.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -294,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         });
                     }
                 });
+                //Фотография ямы
                 try {
                     String photo = pitsById.get("photo");
                     String photoRepl = photo.replace("|", ";");
@@ -302,13 +300,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                //Адрес ямы
                 address.setText(adr);
                 return false;
             }
         });
-
     }
 
+    //PendingIntent для geofence
     private PendingIntent getGeofencePendingIntent() {
         if (mGeofencePendingIntent != null) {
             return mGeofencePendingIntent;
@@ -318,37 +317,33 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         return mGeofencePendingIntent;
     }
 
+    //Запрос на получение текущего местоположения
     protected void createLocationRequest() {
-        mLocationRequest = new LocationRequest();
+        LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(1500);
         mLocationRequest.setFastestInterval(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-
+    //Обработка создания geofence
     @Override
     public void onComplete(@NonNull Task<Void> task) {
         if (task.isSuccessful()) {
             //Toast.makeText(this, "Успешно добавлено", Toast.LENGTH_SHORT).show();
         } else {
-//            Toast.makeText(this, "Возникла проблема", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "Возникла проблема", Toast.LENGTH_SHORT).show();
         }
     }
 
-    public static class GeofenceBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            tts.speak("Внимание! Впереди яма!", TextToSpeech.QUEUE_FLUSH, null);
-//            Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
-        }
-    }
-
+    //Основной метод добавления geofence
     public void addGeofence(GeofencingClient client, GeofencingRequest.Builder geofencingRequestBuilder) {
         mGeofenceList.clear();
+        //Получение ям
         final DataBaseHelper dataBaseHelper = new DataBaseHelper(MainActivity.this);
         ArrayList<HashMap<String, String>> listPits = dataBaseHelper.getPits();
         if (mLocation != null) {
             int i = 0;
+            //Выгрузка координат и создание geofence
             while (i < listPits.size()) {
                 if (listPits.get(i).get("stat").equals("Отремонтировано") || listPits.get(i).get("stat").equals("Нет ответа")) {
 
@@ -357,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         Location newLocation = new Location("newlocation");
                         newLocation.setLatitude(Double.parseDouble(listPits.get(i).get("Lat")));
                         newLocation.setLongitude(Double.parseDouble(listPits.get(i).get("Lng")));
-                        distance = mLocation.distanceTo(newLocation);
+                        float distance = mLocation.distanceTo(newLocation);
                         if (distance < 500 && mGeofenceList.size() < 100) {
                             double lat = Double.parseDouble(listPits.get(i).get("Lat"));
                             double lng = Double.parseDouble(listPits.get(i).get("Lng"));
@@ -384,15 +379,23 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 i++;
             }
         }
+        //Добавление geofence
         if (mGeofenceList.size() > 0) {
             GeofencingRequest.Builder addGeofence = geofencingRequestBuilder.addGeofences(mGeofenceList);
             GeofencingRequest geofencingRequest = addGeofence.build();
-
-
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             }
             client.addGeofences(geofencingRequest, getGeofencePendingIntent())
                     .addOnCompleteListener(this);
+        }
+    }
+
+    //Обработчик на вход в зону geofence
+    public static class GeofenceBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            tts.speak("Внимание! Впереди яма!", TextToSpeech.QUEUE_FLUSH, null);
+//            Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
         }
     }
 }

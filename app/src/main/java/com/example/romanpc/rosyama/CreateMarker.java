@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,29 +55,34 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_marker);
-        ActionBar actionBar =getSupportActionBar();
+        //Кнопка "Назад на ActionBar"
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setHomeButtonEnabled(true);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
+        //Создание MapView и инициализция
         MapView mapView = (MapView) findViewById(R.id.mapView);
         mapView.getMapAsync(this);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
+        //Текстовое поле Адрес
         adr = (TextView)findViewById(R.id.textView21);
+        //Получение региона из SplashActivity
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         region = sharedPreferences.getString("region", "");
-
+        //Кнопка добавления ямы
         Button btn = (Button) findViewById(R.id.button7);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(lat != 0.0 && lng != 0.0) {
+                    //Добавление ямы
                     DataBaseHelper dataBaseHelper = new DataBaseHelper(CreateMarker.this);
                     Random random = new Random();
                     int i = random.nextInt(1000000) + 200000;
                     dataBaseHelper.addPit(i, lat, lng, address, null, null);
+                    //Отправка запроса на сервер на добавление ямы
                     ApiService.getApi("http://kredit55.ru/").savePit(region, String.valueOf(lat), String.valueOf(lng), address).enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -101,6 +105,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
         });
     }
 
+    //Обработчик нажатия на кнопку "Назад"
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -111,17 +116,21 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    //Основная работа карты
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        //Инициализация карты
         mMap = googleMap;
-        int i = 0;
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        //Кнопка местоположения
         mMap.setMyLocationEnabled(true);
+        //Обработчик нажатия на карту
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
+                //Добавление маркера
                 if(hasMarker == 0){
                     Marker marker = mMap.addMarker(new MarkerOptions().position(latLng));
                     hasMarker++;
@@ -131,6 +140,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
                 }
                 lat = latLng.latitude;
                 lng = latLng.longitude;
+                //Работа Геокодера(Получение адреса)
                 Locale myLocale = new Locale("ru","RU");
                 Geocoder geocoder = new Geocoder(CreateMarker.this, myLocale);
                 try {
@@ -144,6 +154,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
+        //Получение последнего местоположения
         FusedLocationProviderClient mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         mFusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {

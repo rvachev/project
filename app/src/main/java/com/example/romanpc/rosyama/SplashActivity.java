@@ -41,13 +41,17 @@ public class SplashActivity extends AppCompatActivity {
         }
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_splash);
-            ArrayList<String> list = dataBaseHelper.getCities();
 
+
+            //Спиннер городов
             spinner = (Spinner) findViewById(R.id.spinner);
+            ArrayList<String> list = dataBaseHelper.getCities();
+            //Заполнение спиннера
             final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinner.setAdapter(adapter);
 
+            //Обработчик на выбранный спиннер
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -66,12 +70,14 @@ public class SplashActivity extends AppCompatActivity {
                 }
             });
 
+            //Кнопка выбора города
             button = (Button) findViewById(R.id.button2);
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     final ProgressBar progressBar = (ProgressBar)findViewById(R.id.progressBar);
                     progressBar.setVisibility(ProgressBar.VISIBLE);
+                    //Получение ям с сервера
                     ApiService.getApi("http://kredit55.ru/").getPitsByRegionName(region).enqueue(new Callback<ResponseBody>() {
                         @Override
                         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

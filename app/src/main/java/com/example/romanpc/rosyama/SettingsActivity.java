@@ -58,15 +58,15 @@ public class SettingsActivity extends AppCompatActivity {
                 return false;
             }
         });
-
+        //Спиннер городов
         spinner = (Spinner)findViewById(R.id.spinner2);
         final DataBaseHelper dataBaseHelper = new DataBaseHelper(this);
         ArrayList<String> list = dataBaseHelper.getCities();
-
+        //Заполнение спиннера
         final ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, list);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-
+        //Обработчик на выбранный элемент спиннера
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -84,10 +84,12 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        //Выбор города
         button = (Button)findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //Запрос на получение ям с сервера
                 ApiService.getApi("http://kredit55.ru/").getPitsByRegionName(region).enqueue(new Callback<ResponseBody>() {
                     @Override
                     public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

@@ -10,9 +10,6 @@ import android.view.View;
 import android.widget.ImageButton;
 
 public class Info extends AppCompatActivity {
-
-    private ImageButton btnProf, btnMap;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

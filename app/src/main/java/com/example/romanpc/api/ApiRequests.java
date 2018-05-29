@@ -6,7 +6,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 
 public interface ApiRequests {
-
+    //Связь с сервероом
     @GET("/get_pits_by_region_name.php")
     Call<ResponseBody> getPitsByRegionName(@Query("region") String regionName);
 

@@ -2,7 +2,7 @@ package com.example.romanpc.rosyama;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
-
+//Класс-помощник кластеризации
 public class ClusterItemImpl implements ClusterItem {
     private final LatLng mPosition;
     private String pitId;
