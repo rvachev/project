@@ -42,7 +42,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class CreateMarker extends AppCompatActivity implements OnMapReadyCallback {
+public class CreateMarker extends CommonActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private static double lat, lng;

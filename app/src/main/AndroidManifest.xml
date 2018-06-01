@@ -69,6 +69,10 @@
             android:label="Настройки"
             android:screenOrientation="portrait"
             android:launchMode="singleTask"/>
+        <activity
+            android:name=".CommonActivity"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/>
     </application>
 
 </manifest>

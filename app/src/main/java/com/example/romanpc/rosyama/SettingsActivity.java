@@ -26,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends CommonActivity {
 
     private Spinner spinner;
     private Button button;
@@ -37,27 +37,27 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.navigation_home:
-                        break;
-                    case R.id.navigation_dashboard:
-                        Intent intent1 = new Intent(SettingsActivity.this, MainActivity.class);
-                        startActivity(intent1);
-                        finish();
-                        break;
-                    case R.id.navigation_notifications:
-                        Intent intent = new Intent(SettingsActivity.this, Info.class);
-                        startActivity(intent);
-                        finish();
-                        break;
-                }
-                return false;
-            }
-        });
+//        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+//        navigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
+//            @Override
+//            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+//                switch (item.getItemId()) {
+//                    case R.id.navigation_home:
+//                        break;
+//                    case R.id.navigation_dashboard:
+//                        Intent intent1 = new Intent(SettingsActivity.this, MainActivity.class);
+//                        startActivity(intent1);
+//                        finish();
+//                        break;
+//                    case R.id.navigation_notifications:
+//                        Intent intent = new Intent(SettingsActivity.this, Info.class);
+//                        startActivity(intent);
+//                        finish();
+//                        break;
+//                }
+//                return false;
+//            }
+//        });
         //Спиннер городов
         spinner = (Spinner)findViewById(R.id.spinner2);
         final DataBaseHelper dataBaseHelper = new DataBaseHelper(this);

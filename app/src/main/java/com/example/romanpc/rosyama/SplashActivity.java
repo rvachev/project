@@ -98,7 +98,7 @@ public class SplashActivity extends AppCompatActivity {
                                 dataBaseHelper1.addPit(Integer.parseInt(split[0]), Double.parseDouble(split[3]), Double.parseDouble(split[4]), split[2], status, photo);
                             }
                             progressBar.setVisibility(ProgressBar.INVISIBLE);
-                            startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                            startActivity(new Intent(SplashActivity.this, CommonActivity.class));
                         }
 
                         @Override
