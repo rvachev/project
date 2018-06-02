@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -64,7 +65,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends CommonActivity implements OnMapReadyCallback, OnCompleteListener<Void> {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback, OnCompleteListener<Void> {
 
     private GoogleMap mMap;
     private static final int PERMISSION_REQUEST_FOR_GET_USER_LOCATION = 1;
@@ -76,7 +77,9 @@ public class MainActivity extends CommonActivity implements OnMapReadyCallback, 
     private TextView address;
     private static Location mLocation;
     private ImageView imageView;
-    private static ArrayList<Geofence> allPits;
+    private static ArrayList<LatLng> allPits;
+    private ActionBarDrawerToggle toggle;
+    private DrawerLayout drawer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,14 +94,39 @@ public class MainActivity extends CommonActivity implements OnMapReadyCallback, 
             }
         });
 
+        ActionBar supportActionBar = this.getSupportActionBar();
+        if (supportActionBar != null) {
+            supportActionBar.setDisplayHomeAsUpEnabled(true);
+        }
+
+        drawer = findViewById(R.id.drawerMain);
+
+        toggle = new ActionBarDrawerToggle(this, drawer, R.string.open, R.string.close);
+
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_viewMain);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+
+                if (id == R.id.map) {
+                    startActivity(new Intent(MainActivity.this, MainActivity.class));
+                } else if (id == R.id.addPit) {
+                    startActivity(new Intent(MainActivity.this, CreateMarker.class));
+                } else if (id == R.id.settings) {
+                    startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+                }
+                DrawerLayout drawer = findViewById(R.id.drawerMain);
+                drawer.closeDrawer(GravityCompat.START);
+                return true;
+            }
+        });
+
         //Экран не гаснет во время работы приложения
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        //Кнопка "Назад на ActionBar"
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setHomeButtonEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
         //Текстовое поле "Адрес" в BottomSheet
         address = (TextView) findViewById(R.id.textView16);
 
@@ -122,22 +150,23 @@ public class MainActivity extends CommonActivity implements OnMapReadyCallback, 
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, CreateMarker.class);
                 startActivity(intent);
+                finish();
             }
         });
 
     }
     //Обработка нажатия кнопки "Назад" в ActionBar
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        switch (item.getItemId()) {
-//            case android.R.id.home:
-//                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-//                startActivity(intent);
-//                return true;
-//            default:
-//                return super.onOptionsItemSelected(item);
-//        }
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            }else {
+                drawer.openDrawer(GravityCompat.START);
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     //Разрешение на доступ к местоположению
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -216,8 +245,7 @@ public class MainActivity extends CommonActivity implements OnMapReadyCallback, 
                 @Override
                 public void onLocationChanged(Location location) {
                     mLocation = location;
-                    allPits.addAll(mGeofenceList);
-                    client.removeGeofences(getGeofencePendingIntent());
+                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
                     addGeofence(client, geofencingRequestBuilder);
                 }
 
@@ -359,9 +387,13 @@ public class MainActivity extends CommonActivity implements OnMapReadyCallback, 
                         newLocation.setLatitude(Double.parseDouble(listPits.get(i).get("Lat")));
                         newLocation.setLongitude(Double.parseDouble(listPits.get(i).get("Lng")));
                         float distance = mLocation.distanceTo(newLocation);
+                        if(mGeofenceList.size() > 98){
+                            mGeofenceList.clear();
+                        }
                         if (distance < 500 && mGeofenceList.size() < 100) {
                             double lat = Double.parseDouble(listPits.get(i).get("Lat"));
                             double lng = Double.parseDouble(listPits.get(i).get("Lng"));
+                            LatLng latLng = new LatLng(lat, lng);
                             Marker marker = mMap.addMarker(new MarkerOptions().position(new LatLng(lat, lng)));
                             marker.setTag(listPits.get(i).get("_id"));
                             Geofence.Builder geofenceBuilder = new Geofence.Builder();
@@ -371,14 +403,15 @@ public class MainActivity extends CommonActivity implements OnMapReadyCallback, 
                             geofenceBuilder.setExpirationDuration(Geofence.NEVER_EXPIRE);
                             Geofence geofence = geofenceBuilder.build();
                             int x = 0;
-                            for (int j = 0; j < allPits.size(); j++) {
-                                if (geofence.equals(allPits.get(j))) {
+                            for(int j = 0; j < allPits.size(); j++){
+                                if(latLng.equals(allPits.get(j))){
                                     x++;
                                 }
                             }
-                            if (x == 0) {
+                            if(x == 0) {
                                 mGeofenceList.add(geofence);
                             }
+                            allPits.add(new LatLng(lat, lng));
                         }
                     }
                 }
@@ -391,8 +424,7 @@ public class MainActivity extends CommonActivity implements OnMapReadyCallback, 
             GeofencingRequest geofencingRequest = addGeofence.build();
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             }
-            client.addGeofences(geofencingRequest, getGeofencePendingIntent())
-                    .addOnCompleteListener(this);
+            client.addGeofences(geofencingRequest, getGeofencePendingIntent()).addOnCompleteListener(this);
         }
     }
 
@@ -401,7 +433,7 @@ public class MainActivity extends CommonActivity implements OnMapReadyCallback, 
         @Override
         public void onReceive(Context context, Intent intent) {
             tts.speak("Внимание! Впереди яма!", TextToSpeech.QUEUE_FLUSH, null);
-//            Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(context, "Вы в зоне", Toast.LENGTH_SHORT).show();
         }
     }
 }
