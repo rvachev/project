@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static final int PERMISSION_REQUEST_FOR_GET_USER_LOCATION = 1;
     private FloatingActionButton fab;
     private ArrayList<Geofence> mGeofenceList;
-    private PendingIntent mGeofencePendingIntent;
+    private static PendingIntent mGeofencePendingIntent;
     private static TextToSpeech tts;
     private BottomSheetBehavior bottomSheetBehavior;
     private TextView address;
@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private static ArrayList<LatLng> allPits;
     private ActionBarDrawerToggle toggle;
     private DrawerLayout drawer;
+    private static LocationManager locationManager;
+    private static LocationListener locationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,9 +114,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
 
-                if (id == R.id.map) {
-                    startActivity(new Intent(MainActivity.this, MainActivity.class));
-                } else if (id == R.id.addPit) {
+                if (id == R.id.addPit) {
                     startActivity(new Intent(MainActivity.this, CreateMarker.class));
                 } else if (id == R.id.settings) {
                     startActivity(new Intent(MainActivity.this, SettingsActivity.class));
@@ -239,9 +239,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 });
         //Отслеживание изменения местоположения
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (locationManager != null) {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, new LocationListener() {
+            locationListener = new LocationListener() {
                 @Override
                 public void onLocationChanged(Location location) {
                     mLocation = location;
@@ -263,7 +263,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 public void onProviderDisabled(String provider) {
 
                 }
-            });
+            };
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
         }
     }
 
@@ -380,7 +381,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             //Выгрузка координат и создание geofence
             while (i < listPits.size()) {
                 if (listPits.get(i).get("stat").equals("Отремонтировано") || listPits.get(i).get("stat").equals("Нет ответа")) {
-
                 } else {
                     if (mLocation != null) {
                         Location newLocation = new Location("newlocation");
@@ -389,6 +389,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         float distance = mLocation.distanceTo(newLocation);
                         if(mGeofenceList.size() > 98){
                             mGeofenceList.clear();
+                            client.removeGeofences(mGeofencePendingIntent);
                         }
                         if (distance < 500 && mGeofenceList.size() < 100) {
                             double lat = Double.parseDouble(listPits.get(i).get("Lat"));
@@ -426,6 +427,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
             client.addGeofences(geofencingRequest, getGeofencePendingIntent()).addOnCompleteListener(this);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        locationManager.removeUpdates(locationListener);
+        super.onDestroy();
     }
 
     //Обработчик на вход в зону geofence

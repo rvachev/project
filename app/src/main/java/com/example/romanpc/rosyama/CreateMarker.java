@@ -85,8 +85,6 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
 
                 if (id == R.id.map) {
                     startActivity(new Intent(CreateMarker.this, MainActivity.class));
-                } else if (id == R.id.addPit) {
-                    startActivity(new Intent(CreateMarker.this, CreateMarker.class));
                 } else if (id == R.id.settings) {
                     startActivity(new Intent(CreateMarker.this, SettingsActivity.class));
                 }

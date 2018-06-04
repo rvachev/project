@@ -68,8 +68,6 @@ public class SettingsActivity extends AppCompatActivity {
                     startActivity(new Intent(SettingsActivity.this, MainActivity.class));
                 } else if (id == R.id.addPit) {
                     startActivity(new Intent(SettingsActivity.this, CreateMarker.class));
-                } else if (id == R.id.settings) {
-                    startActivity(new Intent(SettingsActivity.this, SettingsActivity.class));
                 }
                 DrawerLayout drawer = findViewById(R.id.drawerSettings);
                 drawer.closeDrawer(GravityCompat.START);
