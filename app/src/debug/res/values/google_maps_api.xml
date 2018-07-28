@@ -23,6 +23,8 @@
     AIzaSyDgK0NJBhpu9QVBU0QT3esOiTBsBv-Di9I
     Class
     AIzaSyDdyGWVP0z0RGwYuMuA95_KEcOKzpy_1vw
+
+    AIzaSyDMQlmGLJUZykFgEnVSgwk_JAPPSSw4uq0
     -->
-    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDgK0NJBhpu9QVBU0QT3esOiTBsBv-Di9I</string>
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">AIzaSyDMQlmGLJUZykFgEnVSgwk_JAPPSSw4uq0</string>
 </resources>

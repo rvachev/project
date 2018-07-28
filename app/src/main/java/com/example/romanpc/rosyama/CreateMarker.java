@@ -1,6 +1,7 @@
 package com.example.romanpc.rosyama;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -19,8 +20,10 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -99,7 +102,7 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
         //Текстовое поле Адрес
-        adr = (TextView)findViewById(R.id.textView21);
+//        adr = (TextView)findViewById(R.id.textView21);
         //Получение региона из SplashActivity
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         region = sharedPreferences.getString("region", "");
@@ -181,9 +184,9 @@ public class CreateMarker extends AppCompatActivity implements OnMapReadyCallbac
                 try {
                     List<Address> fromLocation = geocoder.getFromLocation(lat, lng, 1);
                     address = fromLocation.get(0).getAddressLine(0);
-                    if(address != null){
-                        adr.setText(address);
-                    }
+//                    if(address != null){
+//                        adr.setText(address);
+//                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

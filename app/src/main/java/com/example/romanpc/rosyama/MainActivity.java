@@ -6,6 +6,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -205,6 +209,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             }
         });
+
         //Потенциальная фотография ямы
         imageView = (ImageView) findViewById(R.id.imageView);
         //Инициализация карты
@@ -235,6 +240,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onSuccess(Location location) {
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
                         mLocation = location;
+                        Toast.makeText(MainActivity.this, "Высота: " + location.getAltitude(), Toast.LENGTH_SHORT).show();
                         addGeofence(client, geofencingRequestBuilder);
                     }
                 });
