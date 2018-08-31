@@ -219,6 +219,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
         mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.setPadding(0,0,0,250);
+
         //Запрос на получение текущего местоположения
         createLocationRequest();
         //Массивы для работы с geofence
@@ -240,7 +244,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     public void onSuccess(Location location) {
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 15));
                         mLocation = location;
-                        Toast.makeText(MainActivity.this, "Высота: " + location.getAltitude(), Toast.LENGTH_SHORT).show();
                         addGeofence(client, geofencingRequestBuilder);
                     }
                 });
